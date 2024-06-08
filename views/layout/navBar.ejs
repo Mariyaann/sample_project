@@ -1,0 +1,52 @@
+<nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+    <div class="container-fluid m-2">
+        <a class="navbar-brand" href="/">Pure QoQo<span>.</span></a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsFurni">
+            <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li><a class="nav-link" href="/shop">Shop</a></li>
+                <li><a class="nav-link" href="/#why-choose-section">About us</a></li>
+                <li><a class="nav-link" href="/#footer-section">Contact us</a></li>
+            </ul>
+            <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+
+                <li><a class="nav-link" href="/"><i class='bx bx-heart navbar-box-icon ' ></i></a></li>
+                <li><a class="nav-link" href="/"><i class='bx bx-cart-alt navbar-box-icon'></i></a></li>
+                <li><a class="nav-link" href="/"><i class='bx bx-search navbar-box-icon'></i></a></li>
+                <% if(!isLoggedIn ){%>
+                    <li><a class="nav-link" href="/login"><i class='bx bx-user navbar-box-icon'></i></a></li>
+                <%} else {%>
+                    <li><a class="nav-link" href="/logout"><i class='bx bx-log-out-circle navbar-box-icon'></i></a></li>
+                <% }%>
+                <% if(isLoggedIn ){%>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link user-list-div " href="#" id="userDropdown">
+                            <img src="../../user/assets/web-img/user-logo.png" alt="">
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="/profile">Profile</a>
+                            <a class="dropdown-item" href="/orders">Your Orders</a>
+                            <a class="dropdown-item" href="/forgot">Forgot Password</a>
+                        </div>
+                    </li>
+                    
+
+                    <% }%>
+                
+                
+                
+            </ul>
+            
+            
+        </div>
+    </div>
+        
+</nav>

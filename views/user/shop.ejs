@@ -1,0 +1,117 @@
+<%- include('../layout/header') %>
+  <%- include('../layout/navBar') %>
+    <% const currentDate=new Date(); const twoWeeksAgo=new Date(currentDate); twoWeeksAgo.setDate(currentDate.getDate()
+      - 14); %>
+
+
+
+      <div class="untree_co-section product-section before-footer-section shop-container">
+        <div class="container-fluid">
+          <div class="row m-5">
+            <div class="col-3 ">
+
+              <div class="price-filter mb-5">
+                <label for="price-range">FILTER BY PRICE</label>
+                <input type="range" id="price-range" min="0" max="100000" value="0" class="slider">
+                <input type="range" id="price-range-max" min="0" max="100000" value="100000" class="slider">
+                <p>Price: ₹<span id="price-min">0</span> — ₹<span id="price-max">100000</span></p>
+                <button class="filter-button">FILTER</button>
+              </div>
+
+              <div class="price-filter">
+                <label for="price-range">FILTER BY CATEGORY</label>
+                <ul>
+                  <%categoryData.forEach((data)=>{%>
+                    <a href="/shop?category=<%=data.category_id%>">
+                      <li class="categoty-item">
+                        <%if(data.category_name!==null){%>
+                        <%=data.category_name%> <span class="dim">(<%=data.count%>)</span>
+                        <%}%>
+                      </li>
+                    </a>
+                    <%})%>
+                </ul>
+              </div>
+            </div>
+
+            <div class="col-9">
+              <div class="container">
+                
+                <div class="row">
+                  
+                  <% productData.forEach((data)=>{
+                    const img = data.product_image[0]
+                    %>
+                   
+                    <!-- Start Column 1 -->
+                    <div class="col-12 col-md-4 col-lg-4 mb-5">
+                      <a class="product-item" href="/view-product/<%= data._id %>">
+                        <div class="w-100 product-img-container">
+                          <% const itemDate=new Date(data.timestamp); if(data.product_stock<=0) {%>
+                            <span class="out-of-stock">Out Of Stock</span>
+                            <%} else if(data.product_stock<=10){%>
+                              <span class="label-low-stock">Only <%=data.product_stock%> left </span>
+                              <% } else if (itemDate> twoWeeksAgo && itemDate <= currentDate) { %>
+                                  <span class="label-new">new item</span>
+                                  <% } %>
+                                     <img src="../../<%= img %>" class="img-fluid product-thumbnail"> 
+                        </div>
+                        <div class="flex">
+                          <p class="color-primary">
+                            <%= data.category_name %>
+                          </p>
+                          <i class='bx bx-heart card-wish-icon'></i>
+                        </div>
+                        <h3 class="product-title">
+                          <%= data.product_name %>
+                        </h3>
+                        <h5 class="product-price color-primary">₹<%= data.product_price %>
+                        </h5>&nbsp;&nbsp;<%= data.product_quantity %>
+                          <h3 class="product-price">Rating : <i class='bx bxs-star rating'></i> 4.5</h3>
+                          <span class="icon-cross">
+                            <img src="../../user/assets/web-img/cross.svg" class="img-fluid">
+                          </span>
+                      </a>
+                    </div>
+                    <% })%>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+          const priceMinElem = document.getElementById('price-min');
+          const priceMaxElem = document.getElementById('price-max');
+          const sliderMin = document.getElementById('price-range');
+          const sliderMax = document.getElementById('price-range-max');
+
+          function updatePrices() {
+            priceMinElem.textContent = Number(sliderMin.value).toLocaleString();
+            priceMaxElem.textContent = Number(sliderMax.value).toLocaleString();
+          }
+
+          sliderMin.addEventListener('input', () => {
+            if (parseInt(sliderMin.value) > parseInt(sliderMax.value)) {
+              sliderMin.value = sliderMax.value;
+            }
+            updatePrices();
+          });
+
+          sliderMax.addEventListener('input', () => {
+            if (parseInt(sliderMax.value) < parseInt(sliderMin.value)) {
+              sliderMax.value = sliderMin.value;
+            }
+            updatePrices();
+          });
+
+          updatePrices();
+        });
+      </script>
+
+      <% -include('../layout/footer') %>
+        </body>
+
+        </html>
