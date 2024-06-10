@@ -33,7 +33,7 @@ const addToCart = async (req, res) => {
             
         } else {
             data['cart_status'] = 1;
-            await cartCollection.insertOne(data);
+            await cartCollection.insertMany(data);
         }
 
         globalNotification = {
@@ -79,8 +79,30 @@ const viewProduct = async (req, res) => {
 
   const viewCart= async (req,res)=>{
       const userId= req.session.user;
+      let productData=[]
       try{  
-            const cartItems = await cartCollection.find({customer_id: new ObjectId(userId),cart_status:1})
+            let cartItems = await cartCollection.find({customer_id: new ObjectId(userId)})
+            
+            if(cartItems)
+                {
+                    await checkProductAvailability(cartItems)
+                     productData = await cartCollection.aggregate([
+                        { $match: { customer_id: new ObjectId(userId) } },
+                        { 
+                            $lookup: {
+                                from: 'products',  // Name of the collection to join
+                                localField: 'product_id',   // Field from the input documents
+                                foreignField: '_id',        // Field from the documents of the "from" collection
+                                as: 'product_data'          // Output array field
+                            }
+                        }
+                    ]);
+                    
+                    // productData=(JSON.stringify(productData, null, 2));
+                }
+                console.log(productData)
+            res.render('./user/cart',{productData})    
+
       }
       catch(err){
         console.log(err)
@@ -89,9 +111,56 @@ const viewProduct = async (req, res) => {
 
   }
 
-async function ckeckProductAvailability(productId,userId,userStock){
+  async function checkProductAvailability(cartItems) {
+    const updatedCartItems = [];
 
+    for (const element of cartItems) {
+        let response = { status: true };
+
+        try {
+            const product = await productCollection.findOne({ _id: new ObjectId(element.product_id), product_status: 1 });
+
+            if (!product) {
+                await cartCollection.findOneAndUpdate({_id: new ObjectId(element._id)},{$set:{cart_status : 0}})
+                response = {
+                    status: false,
+                    message: "Product Not Available"
+                };
+            } else if (product.product_stock <= 0) {
+                await cartCollection.findOneAndUpdate({_id: new ObjectId(element._id)},{$set:{cart_status : 0}})
+                response = {
+                    status: false,
+                    message: "Out Of Stock"
+                };
+            } else if (product.product_stock < element.quantity) {
+                await cartCollection.findOneAndUpdate({_id: new ObjectId(element._id)},{$set:{cart_status : 0}})
+                response = {
+                    status: false,
+                    message: `Product stock is limited. You can purchase a maximum of ${product.product_stock} quantity`
+                };
+            }
+        } catch (err) {
+            console.error(err);
+            response = {
+                status: false,
+                message: "Error checking product availability"
+            };
+        }
+
+        const plainElement = element.toObject ? element.toObject() : element;  // Convert to plain object if it's a Mongoose document
+        plainElement.availability = response.status;
+
+        if (!response.status) {
+            plainElement.message = response.message;
+        }
+
+        updatedCartItems.push(plainElement);
+    }
+
+    return updatedCartItems;
 }
+
+
 
   async function productExist(productId,userId){
     let responce;
