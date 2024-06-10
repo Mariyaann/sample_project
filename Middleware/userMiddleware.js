@@ -15,7 +15,8 @@ const userSessionCheck = async (req, res, next) => {
   if (req.session.user && data !== null) {
     next();
   } else {
-    res.redirect("/");
+    res.redirect("/login");
   }
+  
 };
 module.exports = { isUserLogedIn, userSessionCheck };

@@ -21,7 +21,7 @@ const showShopPage = async (req, res) => {
               }
             }
           ])
-          console.log(categoryData);
+          
           const productData= await productCollection.find({product_status:1}).sort({timestamp:-1})
           res.render('./user/shop',{categoryData,productData})
     } 

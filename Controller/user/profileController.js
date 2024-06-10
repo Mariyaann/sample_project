@@ -30,12 +30,12 @@ const updateProfile = async (req,res)=>{
     const validate = validation.userUpdateValidation(data)
     if(validate.status)
         {
-            console.log(data)
+            
            try{
             const updateUser= await clientCollection.findOneAndUpdate({_id : new ObjectId(id)},{
                 $set:{ customer_name:data.customer_name , customer_phone: data.customer_phone}
             })
-            console.log(updateUser)
+            
             globalNotification={
                 status:'success',
                 message:"Profile Updated Successfully"
@@ -49,7 +49,7 @@ const updateProfile = async (req,res)=>{
         }
         else
         {
-            console.log(data)
+            
             let notification={
                 status :'error',
                 message:validate.message
@@ -124,7 +124,7 @@ const editAddress= async(req,res)=>{
             { $match: { _id: new ObjectId(id) } },
             { $project: { customer_address: { $arrayElemAt: ["$customer_address", index] } } }
         ])
-        console.log(getAddress);
+        
         if(getAddress!== null)
             {
                 res.render('./user/editAddress',{data:getAddress[0].customer_address , index,notification})

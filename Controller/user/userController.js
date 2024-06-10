@@ -235,25 +235,7 @@ const logout = (req, res) => {
     });
   }
 };
-// ------------------------- View Single Product -----------------------
 
-const viewProduct = async (req, res) => {
-  const id = req.params.id || "";
-  if (id !== "") {
-    try {
-      const productData = await productCollection.findOne({
-        _id: new ObjectId(id),
-      });
-      const allProducts = await productCollection.find({category_id:productData.category_id, product_status:1 , _id:{$ne:new ObjectId(productData._id)}})
-      res.render("./user/singleProduct", { productData,allProducts});
-    } catch (err) {
-      console.log(err);
-      res.redirect("/");
-    }
-  } else {
-    res.redirect("/");
-  }
-};
 
 // ---------------- Reset password page load --------------
 const resetPassword = (req, res) => {
@@ -459,7 +441,6 @@ module.exports = {
   loginLoad,
   userLogin,
   logout,
-  viewProduct,
   resetPassword,
   verifyEmail,
   passwordOtpVerify,
