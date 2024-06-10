@@ -986,3 +986,20 @@ a{
   height: 100vh !important;
   }
   }
+
+  /* Hide arrows in Firefox */
+  .quantity-bar {
+  -moz-appearance: textfield;
+}
+
+/* Hide arrows in Chrome, Safari, Edge, and Opera */
+.quantity-bar::-webkit-outer-spin-button,
+.quantity-bar::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide arrows in Internet Explorer */
+.quantity-bar{
+  -ms-appearance: textfield;
+}
