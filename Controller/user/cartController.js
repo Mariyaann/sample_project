@@ -79,7 +79,12 @@ const viewProduct = async (req, res) => {
 
   const viewCart= async (req,res)=>{
       const userId= req.session.user;
-      let productData=[]
+      let productData=[];
+      let notification={}
+      if(globalNotification.status){
+        notification=globalNotification;
+        globalNotification={}
+      }
       try{  
             let cartItems = await cartCollection.find({customer_id: new ObjectId(userId)})
             
@@ -98,10 +103,9 @@ const viewProduct = async (req, res) => {
                         }
                     ]);
                     
-                    // productData=(JSON.stringify(productData, null, 2));
                 }
-                console.log(productData)
-            res.render('./user/cart',{productData})    
+                
+            res.render('./user/cart',{productData, notification})    
 
       }
       catch(err){
@@ -110,6 +114,33 @@ const viewProduct = async (req, res) => {
 
 
   }
+
+//   --------------------- Remove cart item -------------- 
+
+const removeCartItem = async (req,res)=>{
+    const cartId = req.params.id
+    try{
+        const removeItem = await cartCollection.findOneAndDelete({_id: new ObjectId(cartId)})
+        if(removeItem)
+            {
+                globalNotification={
+                    status:'success',
+                    message:"Item Removed from Cart"
+                }
+                
+            }
+    }
+    catch(err)
+    {
+        globalNotification={
+            status:'error',
+            message:"Something went wrong"
+        }
+        console.log(err)
+    }
+    res.redirect('/view-cart')
+
+}
 
   async function checkProductAvailability(cartItems) {
     const updatedCartItems = [];
@@ -160,8 +191,6 @@ const viewProduct = async (req, res) => {
     return updatedCartItems;
 }
 
-
-
   async function productExist(productId,userId){
     let responce;
     
@@ -200,7 +229,8 @@ const viewProduct = async (req, res) => {
 module.exports = {
     addToCart,
     viewProduct,
-    viewCart
+    viewCart,
+    removeCartItem
 }
 
 

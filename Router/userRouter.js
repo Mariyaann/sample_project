@@ -6,7 +6,8 @@ const shopController = require('../Controller/user/shopController')
 const profileController = require('../Controller/user/profileController')
 const cartController = require('../Controller/user/cartController')
 require('../Service/googleAuth')
-const {userSessionCheck}= require('../Middleware/userMiddleware')
+const {userSessionCheck}= require('../Middleware/userMiddleware');
+const cartCollection = require("../Schema/cartModel");
 router.get('/',userContoller.indexPage)
 
 router.get('/signup',userContoller.showSignUp)
@@ -44,5 +45,6 @@ router.get('/remove-address/:index',userSessionCheck,profileController.removeAdd
 
 router.post('/add-to-cart/:id',userSessionCheck,cartController.addToCart)
 router.get('/view-cart',userSessionCheck,cartController.viewCart)
+router.get('/remove-cart-item/:id',userSessionCheck,cartController.removeCartItem)
 
 module.exports = router     

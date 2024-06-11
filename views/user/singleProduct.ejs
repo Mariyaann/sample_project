@@ -53,8 +53,12 @@
                   4.5
                 </span>
               </div>
+              <% if(productData.product_stock>0) {%>
               <span class="text-muted"><i class="fas fa-shopping-basket fa-sm mx-1"></i><%= productData.product_stock%></span>
               <span class="text-success ms-2">In stock</span>
+              <% } else{ %>
+                <h5 class="text-success ms-2">Out of Stock</h5>
+                <% } %>
             </div>
 
             <div class="mb-3">
@@ -69,7 +73,7 @@
 
 
             <hr />
-
+            <% if(productData.product_stock>0){ %>
             <div class="row mb-4">
 
               <!-- col.// -->
@@ -98,9 +102,9 @@
             </div>
             <a href="#" class="btn btn-warning shadow-0"> Buy now </a>
             
-            <button type="submit" class="btn btn-primary shadow-0"> <i class="me-1 fa fa-shopping-basket"></i> Add to cart </button>
-           
-            <a href="#" class="btn btn-light border border-secondary py-2 icon-hover px-3"> <i class="me-1 fa fa-heart fa-lg"></i> Save </a>
+            <button type="submit" class="btn btn-primary shadow-0"> <i class="me-1 fa fa-shopping-basket"></i> Add to cart </button>          
+          <% } %>
+          <a href="#" class="btn btn-light border border-secondary py-2 icon-hover px-3"> <i class="me-1 fa fa-heart fa-lg"></i> Save </a>
           </div>
         </main>
 
