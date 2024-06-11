@@ -1,6 +1,7 @@
 const { ObjectId } = require('mongodb')
 const cartCollection = require('../../Schema/cartModel')
 const productCollection = require('../../Schema/productModel')
+const clinetCollection = require('../../Schema/clientModel')
 let globalNotification ={}
 const addToCart = async (req, res) => {
     const data = {
@@ -142,6 +143,84 @@ const removeCartItem = async (req,res)=>{
 
 }
 
+// ----------------------- load CeckOut Page -----------------------
+const checkoutPage = async (req,res)=>{
+    const user_id = req.session.user;
+    let notification={}
+
+    try{
+        const userData= await clinetCollection.findOne({_id: new ObjectId(user_id),customer_status:1},{customer_name:1,customer_phone:1,customer_emailid:1,customer_address:1})
+        let productData = await cartCollection.find({customer_id: new ObjectId(user_id)})
+        await checkProductAvailability(productData);
+        productData=await cartCollection.aggregate([
+            { $match: { customer_id: new ObjectId(user_id), cart_status : 1} },
+            { 
+                $lookup: {
+                    from: 'products',  
+                    localField: 'product_id',   
+                    foreignField: '_id',        
+                    as: 'product_data'
+                }
+            }
+        ]);
+        if(productData.length!== 0)
+            {
+                
+                res.render('./user/checkOut',{userData,productData})
+            }
+            else
+            {
+                globalNotification={
+                    status:'error',
+                    message:'Cart is empty add something to Cart'
+                }
+                res.redirect('/view-cart')
+            }
+        
+    }
+    catch(err)
+    {
+        console.log(err);
+        globalNotification={
+            status:'error',
+            message:'something went wrong.Try again'
+        }
+        res.redirect('/view-cart')
+    }
+    
+
+
+}
+const checkOut = async (req,res)=>{
+    const userId= req.session.user;
+    const addressData = {
+        building: req.body.building,
+        street: req.body.street,
+        city: req.body.city,
+        country: req.body.country,
+        pincode: req.body.pincode
+    }
+    const customerData = {
+        customer_name: req.body.customer_name,
+        customer_emailid: req.body.customer_emailid
+    }
+    try
+    {
+        let cartData = await cartCollection.find({customer_id: new ObjectId(userId),cart_status:1})
+        await checkProductAvailability(cartData);
+        cartData = await cartCollection.find({customer_id: new ObjectId(userId),cart_status:1})
+        
+    }
+    catch(err){
+        globalNotification={
+            status:'error',
+            message:"Somthing went wrong"
+        }
+        res.redirect('/view-cart')
+    }
+}
+
+
   async function checkProductAvailability(cartItems) {
     const updatedCartItems = [];
 
@@ -169,6 +248,10 @@ const removeCartItem = async (req,res)=>{
                     status: false,
                     message: `Product stock is limited. You can purchase a maximum of ${product.product_stock} quantity`
                 };
+            }
+            else if(element.cart_status===0)
+            {
+                await cartCollection.findOneAndUpdate({_id: new ObjectId(element._id)},{$set:{cart_status : 1}})
             }
         } catch (err) {
             console.error(err);
@@ -230,7 +313,9 @@ module.exports = {
     addToCart,
     viewProduct,
     viewCart,
-    removeCartItem
+    removeCartItem,
+    checkoutPage,
+    checkOut
 }
 
 
