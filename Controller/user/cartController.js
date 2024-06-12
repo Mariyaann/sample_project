@@ -2,6 +2,8 @@ const { ObjectId } = require('mongodb')
 const cartCollection = require('../../Schema/cartModel')
 const productCollection = require('../../Schema/productModel')
 const clinetCollection = require('../../Schema/clientModel')
+const {addressValidation} = require('../../public/user/validation')
+const orderCollection = require('../../Schema/orderModel')
 let globalNotification ={}
 const addToCart = async (req, res) => {
     const data = {
@@ -13,7 +15,7 @@ const addToCart = async (req, res) => {
     try {
         const stock = await productCollection.findOne({ _id: new ObjectId(data.product_id),product_status:1 }, { product_stock: 1 });
 
-        if (stock.product_stock < data.quantity || data.quantity <= 0) {
+        if(stock.product_stock < data.quantity || data.quantity <= 0) {
             globalNotification = {
                 status: 'error',
                 message: data.quantity <= 0 ? "Please add a valid quantity" : `Maximum quantity that can be added is ${stock.product_stock}`
@@ -147,7 +149,11 @@ const removeCartItem = async (req,res)=>{
 const checkoutPage = async (req,res)=>{
     const user_id = req.session.user;
     let notification={}
-
+    if(globalNotification.status)
+        {
+            notification = globalNotification;
+            globalNotification={}
+        }
     try{
         const userData= await clinetCollection.findOne({_id: new ObjectId(user_id),customer_status:1},{customer_name:1,customer_phone:1,customer_emailid:1,customer_address:1})
         let productData = await cartCollection.find({customer_id: new ObjectId(user_id)})
@@ -166,7 +172,7 @@ const checkoutPage = async (req,res)=>{
         if(productData.length!== 0)
             {
                 
-                res.render('./user/checkOut',{userData,productData})
+                res.render('./user/checkOut',{userData,productData,notification})
             }
             else
             {
@@ -191,34 +197,114 @@ const checkoutPage = async (req,res)=>{
 
 
 }
-const checkOut = async (req,res)=>{
-    const userId= req.session.user;
+
+
+const checkOut = async (req, res) => {
+    const userId = req.session.user;
     const addressData = {
         building: req.body.building,
         street: req.body.street,
         city: req.body.city,
         country: req.body.country,
-        pincode: req.body.pincode
-    }
+        pincode: req.body.pincode,
+        phonenumber:Number(req.body.phonenumber)
+    };
     const customerData = {
         customer_name: req.body.customer_name,
         customer_emailid: req.body.customer_emailid
-    }
-    try
-    {
-        let cartData = await cartCollection.find({customer_id: new ObjectId(userId),cart_status:1})
-        await checkProductAvailability(cartData);
-        cartData = await cartCollection.find({customer_id: new ObjectId(userId),cart_status:1})
-        
-    }
-    catch(err){
-        globalNotification={
-            status:'error',
-            message:"Somthing went wrong"
+    };
+    const paymentMethod = req.body.pay_method;
+
+    // Validate address
+    let addressValid = addressValidation(addressData);
+
+    if (addressValid.status) {
+        try {
+            let cartData = await cartCollection.find({ customer_id: new ObjectId(userId), cart_status: 1 });
+            await checkProductAvailability(cartData);
+
+            let productData = await cartCollection.aggregate([
+                { $match: { customer_id: new ObjectId(userId), cart_status: 1 } },
+                {
+                    $lookup: {
+                        from: 'products',  // Name of the collection to join
+                        localField: 'product_id',   // Field from the input documents
+                        foreignField: '_id',        // Field from the documents of the "from" collection
+                        as: 'product_data'          // Output array field
+                    }
+                }
+            ]);
+
+            if (productData.length !== 0) {
+                let totalSum = 0;
+                let totalQuantity = 0;
+                let orderData = {
+                    customer_id: userId,
+                    products: []
+                };
+
+                productData.forEach(async (product) => {
+                    let productDetail = product.product_data[0]; // Accessing the first element of product_data array
+
+                    // Safely accessing product_image[0]
+                    let productImage = productDetail.product_image && productDetail.product_image.length > 0
+                        ? productDetail.product_image[0]
+                        : null; // or provide a default image URL if needed
+
+                    let singleProduct = {
+                        product_id: productDetail._id,
+                        product_name: productDetail.product_name,
+                        product_category: productDetail.category_name,
+                        product_quantity: product.quantity,
+                        product_price: productDetail.product_price,
+                        product_image: productImage
+                    };
+
+                    totalSum += singleProduct.product_quantity * singleProduct.product_price;
+                    totalQuantity += singleProduct.product_quantity;
+                    orderData.products.push(singleProduct);
+
+                    await productCollection.updateOne(
+                        { _id: singleProduct.product_id },
+                        { $inc: { product_stock: -singleProduct.product_quantity } }
+                    );
+                
+                });
+
+                orderData.totalPrice = totalSum;
+                orderData.totalQuantity = totalQuantity;
+                orderData.address = addressData;
+                orderData.paymentMethod = paymentMethod;
+                orderData.orderStatus = 'Pending';
+                const addOrder = await orderCollection.insertMany(orderData)
+
+                
+
+            } else {
+                globalNotification = {
+                    status: 'error',
+                    message: "Something went wrong"
+                };
+            }
+        } catch (err) {
+            globalNotification = {
+                status: 'error',
+                message: "Something went wrong"
+            };
+            console.log(err);
         }
-        res.redirect('/view-cart')
+    } else {
+        globalNotification = {
+            status: 'error',
+            message: addressValid.message
+        };
+        return res.redirect('/checkout'); // Correct redirection on address validation failure
     }
-}
+
+    res.redirect('/view-cart');
+};
+
+
 
 
   async function checkProductAvailability(cartItems) {

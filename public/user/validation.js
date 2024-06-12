@@ -37,6 +37,7 @@ function signupValidation(data) {
         data.phoneNumber == null ||
         !phonePattern.test(data.phoneNumber)
     ) {
+       
         res['status'] = false;
         res['message'] = 'Phone number not in a required format';
         return res;

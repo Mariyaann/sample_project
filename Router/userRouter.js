@@ -47,6 +47,6 @@ router.post('/add-to-cart/:id',userSessionCheck,cartController.addToCart)
 router.get('/view-cart',userSessionCheck,cartController.viewCart)
 router.get('/remove-cart-item/:id',userSessionCheck,cartController.removeCartItem)
 router.get('/checkout',userSessionCheck,cartController.checkoutPage)
-router.post('/checkout',userSessionCheck,cartController.checkOut)
+router.post('/check-out',userSessionCheck,cartController.checkOut)
 
 module.exports = router     
