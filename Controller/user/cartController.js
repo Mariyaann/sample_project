@@ -5,6 +5,9 @@ const clinetCollection = require("../../Schema/clientModel");
 const { addressValidation } = require("../../public/user/validation");
 const orderCollection = require("../../Schema/orderModel");
 let globalNotification = {};
+
+
+
 const addToCart = async (req, res) => {
   const data = {
     customer_id: req.session.user,

@@ -15,6 +15,8 @@ const userSessionCheck = async (req, res, next) => {
   if (req.session.user && data !== null) {
     next();
   } else {
+    if(req.session.user){
+    req.session.destroy()}
     res.redirect("/login");
   }
   

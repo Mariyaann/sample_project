@@ -9,14 +9,21 @@
         <div class="container-fluid">
           <div class="row m-5">
             <div class="col-3 ">
-
-              <div class="price-filter mb-5">
-                <label for="price-range">FILTER BY PRICE</label>
-                <input type="range" id="price-range" min="0" max="100000" value="0" class="slider">
-                <input type="range" id="price-range-max" min="0" max="100000" value="100000" class="slider">
-                <p>Price: ₹<span id="price-min">0</span> — ₹<span id="price-max">100000</span></p>
-                <button class="filter-button">FILTER</button>
-              </div>
+              <% 
+              let params="";
+              if(category){
+                params= `category=${category}`
+              }
+                 %>
+              <form action="/shop?<%= params  %>" method="post" >
+                <div class="price-filter mb-5">
+                  <label for="price-range">FILTER BY PRICE</label>
+                  <input type="range" id="price-range" min="0" max="100000" value="0" class="slider" name="minPrice">
+                  <input type="range" id="price-range-max" min="0" max="100000" value="100000" class="slider" name="maxPrice">
+                  <p>Price: ₹<span id="price-min">0</span> — ₹<span id="price-max">100000</span></p>
+                  <button type="submit" class="filter-button">FILTER</button>
+                </div>
+              </form>
 
               <div class="price-filter">
                 <label for="price-range">FILTER BY CATEGORY</label>
@@ -30,6 +37,11 @@
                       </li>
                     </a>
                     <%})%>
+                    <a href="/shop">
+                      <li class="categoty-item">
+                        All Products
+                      </li>
+                    </a>
                 </ul>
               </div>
             </div>

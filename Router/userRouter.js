@@ -29,7 +29,8 @@ router.get('/auth/google/callback',
 passport.authenticate('google', { failureRedirect: '/signup' }),userContoller.googleLogin);
 
 // ------------ Shop ----------------- 
-router.get('/shop',shopController.showShopPage)
+router.get('/shop/',shopController.showShopPage)
+router.post('/shop/',shopController.showWIthFilter)
 
 
 // -------------- Profile page ----------------- 
