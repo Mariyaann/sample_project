@@ -6,7 +6,7 @@
 <% if(notification.status === 'error') {%>
     <script>notificationMessage("<%=notification.message%>")</script>
    <%  } else if(notification.status=== 'success'){%>
-    <script>notificationMessage("<%=notification.message%>")</script>
+    <script>successNotification("<%=notification.message%>")</script>
    <%  }%>
 
 
@@ -74,7 +74,7 @@
                                                     
                                                         <div class="mb-3">
                                                             <label class="form-label" for="billing-name">Land mark</label>
-                                                            <input type="text" class="form-control" name="customer_name" placeholder="Enter name" value="<%=userData.customer_name %>">
+                                                            <input type="text" class="form-control" name="landmark" placeholder="Enter landmark" value="<%=address[0].landmark %>">
                                                         </div>
                                                     
                                                     

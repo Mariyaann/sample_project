@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
     customer_id: { type: String },
+    order_id: { 
+        type: Number 
+    },
     products: [{
         product_id: { 
             type: mongoose.Schema.Types.ObjectId ,
@@ -32,12 +35,15 @@ const schema = new mongoose.Schema({
         type: Number 
     },
     address: {
-        contactName: String,
-        pincode: String,
-        homeAddress: String,
-        areaAddress: String,
-        landmark: String,
-        phonenumber:Number
+        customer_name: String,
+        customer_emailid: String,
+        building: String,
+        street: String,
+        city: String,
+        country: String,
+        pincode: Number,
+        phonenumber:Number,
+        landMark:String
     },
     // couponDiscount:{
     //     type:mongoose.Schema.Types.ObjectId,

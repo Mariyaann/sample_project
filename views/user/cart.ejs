@@ -177,9 +177,14 @@
                   <%const GST= Math.round((18/100)* totalPrice *100)/100%>
                   <p class="mb-2"><%=GST%></p>
                 </div>
+                <div class="d-flex justify-content-between">
+                  <p class="mb-2">Shipping Charge:</p>
+                  <%const Shipping= 25 %>
+                  <p class="mb-2"><%=Shipping%></p>
+                </div>
                 <hr />
                 <div class="d-flex justify-content-between">
-                  <% totalPrice= totalPrice+ GST%>
+                  <% totalPrice= totalPrice+ GST + Shipping%>
 
                   <p class="mb-2">Total price:</p>
                   <p class="mb-2 fw-bold"><%= totalPrice %></p>
