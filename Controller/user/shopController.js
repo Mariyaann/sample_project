@@ -4,6 +4,7 @@ const { query } = require('express')
 
 const showShopPage = async (req, res) => {
   const category = req.query.category || ""
+  const sortby = req.query.sortby || ""
     try
     {
         const categoryData= await productCollection.aggregate([
@@ -25,6 +26,7 @@ const showShopPage = async (req, res) => {
             }
           ])
           let query;
+          let sort="";
           if(category){
             query= {product_status:1,
               category_id:category
@@ -34,8 +36,35 @@ const showShopPage = async (req, res) => {
             query= {product_status:1
             }
           }
+          if(sortby)
+            {
+              switch(sortby)
+              {
+                case '1': sort = {product_price: 1}
+                        break;
+                case '2': sort = {product_price: -1}
+                        break;
+                case '3': sort = {timestamp: -1}
+                        break;
+                case '4': sort = {product_name: 1}
+                        break;
+                case '5': sort = {product_name: -1}
+                        break;
+              }
+              
+            }
+            
+            
+            let productData;
+          if(sort){
 
-          const productData= await productCollection.find(query).sort({timestamp:-1})
+             productData= await productCollection.find(query).sort(sort)
+          }
+          else
+          {
+             productData= await productCollection.find(query).sort({timestamp:-1})
+          }
+          
           res.render('./user/shop',{categoryData,productData,category})
     } 
     catch(err)

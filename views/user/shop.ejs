@@ -49,6 +49,16 @@
             <div class="col-9">
               <div class="container">
                 
+                  <div class="sort-box-div">
+                    <select name="sort-box" class="sort-box" onchange="sortbyCategory('<%= category%>')">
+                      <option disabled selected>Sort By</option>
+                      <option value="1">Price low - heigh</option>
+                      <option value="2">Price heigh - low </option>
+                      <option value="3">New arrival </option>
+                      <option value="4">Product Name Aa -Zz </option>
+                      <option value="5">Product Name Zz - Aa</option>
+                    </select>
+                  </div>
                 <div class="row">
                   
                   <% productData.forEach((data)=>{
@@ -121,9 +131,26 @@
 
           updatePrices();
         });
+
+        function sortbyCategory(params){
+            const sortBoxValue = document.getElementsByName('sort-box')[0].value
+            let location;
+            if(params)
+            {
+              location =`category=${params}&sortby=${sortBoxValue}`
+            }
+            else{
+              location =`sortby=${sortBoxValue}`
+            }
+            window.location.href=`/shop?${location}`
+          }
+
+
       </script>
 
       <% -include('../layout/footer') %>
         </body>
 
         </html>
+
+        

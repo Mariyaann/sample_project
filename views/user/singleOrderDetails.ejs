@@ -1,0 +1,159 @@
+<%-include('../layout/header') %>
+  <%- include('../layout/navBar') %>
+
+  <!-- ----------------- Notification section-----------------  -->
+ <% if(notification.status === 'error') {%>
+  <script>notificationMessage("<%=notification.message%>")</script>
+ <%  } else if(notification.status=== 'success'){%>
+  <script>notificationMessage("<%=notification.message%>")</script>
+ <%  }%>
+
+ <div class="container-fluid pt-5 ">
+    <div class="row">
+        <div class="col-xl-8">
+            <% let total =0;
+            productData.products.forEach(product => { 
+                total+=(product.product_price * product.product_quantity)
+                %>
+                
+           
+            <div class="card border shadow-none mb-3">
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center border-bottom pb-3">
+                        <div>
+                            <div class="me-4">
+                            <img src="../../<%=product.product_image %>" alt="" class="avatar-lg rounded order-product-img">
+                        </div>
+                        </div>
+                        <div class="flex-grow-1 align-self-center overflow-hidden">
+                            
+                            <div>
+                                <h5 class="text-truncate font-size-18"><a href="#" class=""><%=product.product_name  %></a></h5>
+                                <p class="text-muted mb-0">
+                                    <i class="bx bxs-star text-warning"></i>
+                                    <i class="bx bxs-star text-warning"></i>
+                                    <i class="bx bxs-star text-warning"></i>
+                                    <i class="bx bxs-star text-warning"></i>
+                                    <i class="bx bxs-star-half text-warning"></i>
+                                </p>
+                                <p class="mb-0 mt-1">Category : <span class="fw-medium color"><%=product.product_category %></span></p>
+                                <p class="mb-0 mt-1">Payment : <span class="fw-medium "><%= productData.paymentMethod  %></span></p>
+                                <p>
+                                </div>
+                            
+                        </div>
+                        <div class="me-4">
+                            <p class="mb-0">
+                    <% if(product.product_status ==='Pending'){ %>
+                        <i class='bx bxs-circle text-warning'></i> 
+                    <% } else if(product.product_status === 'Confirmed'){ %>
+                        <i class='bx bxs-circle text-info'></i> 
+                    <% } else if(product.product_status === 'Returned'){%>
+                        <i class='bx bxs-circle text-dark'></i> 
+                        <%} else if(product.product_status === 'Delivered'){%>
+                        <i class='bx bxs-circle text-success'></i> 
+                    <%} else if(product.product_status === 'Cancelled'){%>
+                        <i class='bx bxs-circle text-danger'></i> 
+                    <%}%>
+                    
+                    <%= product.product_status %>
+                  
+                </p>
+                        </div>
+                        <div class="">
+                            <% if(product.product_status!=='Delivered' && product.product_status!=='Returned' && product.product_status!=='Cancelled'){ %>
+                  <a href="/cancel-single-product/<%= product._id%>" class="btn">Cancel Order</a>
+                  <% } else if(product.product_status ==='Delivered'){%>
+                    <a href="/return-order/<%= product._id%>" class="btn">Return Order</a>
+                    <% } %>
+                    </div>
+                        
+                    </div>
+
+                    <div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mt-3">
+                                    <p class="text-muted mb-2">Price</p>
+                                    <h5 class="mb-0 mt-2"><span class="text-muted me-2"></span>₹<%= product.product_price %></h5>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="mt-3">
+                                    <p class="text-muted mb-2">Quantity</p>
+                                    <div class="d-inline-flex">
+                                        <select class="form-select w-xl" disabled>
+                                            <option disabled selected><%= product.product_quantity %></option>
+                                            
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mt-3">
+                                    <p class="text-muted mb-2">Total</p>
+                                    <h5 class="color">₹<%= product.product_price * product.product_quantity %></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <% }); %>
+
+            
+            
+        </div>
+
+        <div class="col-xl-4">
+            <div class="mt-5 mt-lg-0">
+                <div class="card border shadow-none">
+                    <div class="card-header bg-transparent border-bottom py-3 px-4">
+                        <h5 class="font-size-16 mb-0">Order Summary <span class="float-end">#<%=productData.order_id %></span></h5>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td>Sub Total</td>
+                                        <td class="text-end"><%= total %></td>
+                                    </tr>
+                                    <tr>
+                                        <% const GST = Math.round((18 / 100) * total * 100) / 100; %>
+                                        <td>GST</td>
+                                        <td class="text-end"><%=GST %></td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td>Shipping Charge :</td>
+                                        <td class="text-end">₹ 25</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total Quantity</td>
+                                        <td class="text-end"><%=productData.totalQuantity %></td>
+                                    </tr>
+                                    
+                                    <tr class="bg-light">
+                                        <th>Total :</th>
+                                        <td class="text-end">
+                                            <span class="fw-bold">
+                                                ₹ <%= productData.totalPrice %>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- end table-responsive -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end row -->
+    
+</div>

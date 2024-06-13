@@ -5,9 +5,11 @@ const userContoller=require('../Controller/user/userController')
 const shopController = require('../Controller/user/shopController')
 const profileController = require('../Controller/user/profileController')
 const cartController = require('../Controller/user/cartController')
+const orderController = require('../Controller/user/orderController')
 require('../Service/googleAuth')
 const {userSessionCheck}= require('../Middleware/userMiddleware');
 const cartCollection = require("../Schema/cartModel");
+
 router.get('/',userContoller.indexPage)
 
 router.get('/signup',userContoller.showSignUp)
@@ -49,5 +51,11 @@ router.get('/view-cart',userSessionCheck,cartController.viewCart)
 router.get('/remove-cart-item/:id',userSessionCheck,cartController.removeCartItem)
 router.get('/checkout',userSessionCheck,cartController.checkoutPage)
 router.post('/check-out',userSessionCheck,cartController.checkOut)
+
+// ---------------------- order section ----------------------- 
+
+router.get('/orders',userSessionCheck,orderController.viewOrders)
+router.get('/view-order/:id',userSessionCheck,orderController.viewOrderDetails)
+router.get('/cancel-order/:id',userSessionCheck,orderController.cancelOrder)
 
 module.exports = router     

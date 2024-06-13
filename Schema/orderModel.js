@@ -26,6 +26,11 @@ const schema = new mongoose.Schema({
         
         product_image: { 
             type: String 
+        },
+        product_status: { 
+            type: String,
+            enum:['Confirmed', 'Pending', 'Delivered', 'Returned', 'Cancelled'],
+            default:'Pending'
         }
     }],
     totalQuantity: { 

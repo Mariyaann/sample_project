@@ -841,6 +841,9 @@ cursor: default;
 .filter-button:hover {
   background-color: #00994d;
 }
+.color{
+  color: #00994d !important;
+}
 .color-primary{
   color: #00994d !important;
   font-weight: 400 !important;
@@ -1002,4 +1005,35 @@ a{
 /* Hide arrows in Internet Explorer */
 .quantity-bar{
   -ms-appearance: textfield;
+}
+.sort-box-div{
+  display: flex;
+    justify-content: end;
+}
+.sort-box{
+  padding: 5px 26px;
+    border: 1px solid #adb2b3;
+    /* color: #757171; */
+    border-radius: 3px;
+    /* text-align: center; */
+}
+.sort-box option{
+  border:none
+}
+.sort-box option:hover{
+  background-color: #00994d !important;
+}.order-product-img{
+  width: 7rem;
+}
+.view-button{
+  background: none;
+    color: black;
+    font-weight: 400;
+}.pos-abs{
+  position: relative;
+}
+.pos-rel{
+  position: absolute;
+    right: 14px;
+    top: 30px;
 }
