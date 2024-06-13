@@ -34,3 +34,13 @@ function notificationMessage(message)
     timer: 2500
   });
 }
+
+function successMessage(message){
+  Swal.fire({
+    position: "center",
+    icon: "success",
+    title: message,
+    showConfirmButton: false,
+    timer: 1500
+  });
+}

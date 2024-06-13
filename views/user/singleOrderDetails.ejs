@@ -5,7 +5,7 @@
  <% if(notification.status === 'error') {%>
   <script>notificationMessage("<%=notification.message%>")</script>
  <%  } else if(notification.status=== 'success'){%>
-  <script>notificationMessage("<%=notification.message%>")</script>
+  <script>successMessage("<%=notification.message%>")</script>
  <%  }%>
 
  <div class="container-fluid pt-5 ">
@@ -41,34 +41,7 @@
                                 <p class="mb-0 mt-1">Payment : <span class="fw-medium "><%= productData.paymentMethod  %></span></p>
                                 <p>
                                 </div>
-                            
                         </div>
-                        <div class="me-4">
-                            <p class="mb-0">
-                    <% if(product.product_status ==='Pending'){ %>
-                        <i class='bx bxs-circle text-warning'></i> 
-                    <% } else if(product.product_status === 'Confirmed'){ %>
-                        <i class='bx bxs-circle text-info'></i> 
-                    <% } else if(product.product_status === 'Returned'){%>
-                        <i class='bx bxs-circle text-dark'></i> 
-                        <%} else if(product.product_status === 'Delivered'){%>
-                        <i class='bx bxs-circle text-success'></i> 
-                    <%} else if(product.product_status === 'Cancelled'){%>
-                        <i class='bx bxs-circle text-danger'></i> 
-                    <%}%>
-                    
-                    <%= product.product_status %>
-                  
-                </p>
-                        </div>
-                        <div class="">
-                            <% if(product.product_status!=='Delivered' && product.product_status!=='Returned' && product.product_status!=='Cancelled'){ %>
-                  <a href="/cancel-single-product/<%= product._id%>" class="btn">Cancel Order</a>
-                  <% } else if(product.product_status ==='Delivered'){%>
-                    <a href="/return-order/<%= product._id%>" class="btn">Return Order</a>
-                    <% } %>
-                    </div>
-                        
                     </div>
 
                     <div>

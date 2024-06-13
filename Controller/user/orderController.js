@@ -13,9 +13,12 @@ const viewOrders= async (req,res)=>{
          globalNotification={}
         }
     try{
+        // const updateOrder = await updateOrderStatus(user_id)
+        
         const orderData = await orderCollection.find({customer_id:user_id}).sort({createdAt:-1})
         
         res.render('./user/order',{orderData,notification})
+        
     }
     catch(err)
     {
@@ -80,6 +83,9 @@ const cancelOrder= async (req,res)=>{
                   }
 
                 })
+                await orderCollection.findOneAndUpdate({ _id: orderId},{$set:{orderStatus:'Cancelled'}})
+                // await updateOrderStatus(customer_id)
+                
             }
     }catch(err)
     {
@@ -88,10 +94,10 @@ const cancelOrder= async (req,res)=>{
             message: 'Something went wrong'
         }
         console.log(err)
+        res.redirect('/orders')
     }
-    await updateOrderStatus(customer_id)
     
-    res.redirect('/orders')
+    
 }
 
 // -------------------------------------- Other functions ------------------------- 
@@ -99,10 +105,8 @@ const cancelOrder= async (req,res)=>{
 // ------------------- Recheck order STatus --------------- 
 
 async function updateOrderStatus(customer_id)
-{
-    
+{    
     const getOrderDetails = await orderCollection.find({ customer_id: customer_id })
-    console.log(getOrderDetails)
     getOrderDetails.forEach(async (order)=>{
        const products = order.products;
        let status= true;
