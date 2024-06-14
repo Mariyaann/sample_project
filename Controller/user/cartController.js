@@ -287,7 +287,9 @@ const checkOut = async (req, res) => {
           );
         });
         const GST = Math.round((18 / 100) * totalSum * 100) / 100;
-        const ShippingCharge = 25;
+        if(orderData.totalPrice>=1000){ var ShippingCharge = 25; }
+        else{ var ShippingCharge = 0;   }
+        
         orderData.totalPrice = totalSum + GST + ShippingCharge;
         orderData.totalQuantity = totalQuantity;
         orderData.address = addressData;

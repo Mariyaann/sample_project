@@ -8,22 +8,26 @@
   <script>notificationMessage("<%=notification.message%>")</script>
  <%  }%>
 
-    <section class="h-100" style="background-color: #eee;">
+    <section class="h-100" style="background-color: #fff !important;">
       <div class="container-fluid h-100 py-5 px-5">
         <div class="row d-flex justify-content-center align-items-start h-100">
           <div class="col-8">
 
             <div class="d-flex justify-content-between align-items-center mb-4">
               <h3 class="fw-normal mb-0 text-black">Shopping Cart</h3>
+              <% if(productData.length!==0){ %>
               <div>
                 <p class="mb-0"><span class="text-muted">Sort by:</span> <a href="#!" class="text-body">price <i
                       class="fas fa-angle-down mt-1"></i></a></p>
               </div>
+              <% } %>
             </div>
             <%if(productData.length===0){%>
               <div class="text-center">
+                <!-- <img src="../../public/user/assets/web-img/cart-empty.gif" alt=""> -->
+                <img  src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/3bd05447340145.587755b7635a0.gif">
                 <h5>Your cart is empty!</h5>
-              <p>Add items to it now.</p>
+              <p>Look like you have not added anything to cart. Go ahead & explore top Categorys.</p>
               <a href="/shop" class="btn btn-light  border mt-2"> Shop Now </a>
               </div>
 
@@ -132,8 +136,8 @@
 
 
           </div>
-          <div class="col-4 " style="margin-top: 0.7rem;">
-            <div class="card mb-3 mt-5  border shadow-0 ">
+          <div class="col-4 " >
+            <div class="card mb-3 border shadow-0 ">
               <div class="card-body ">
                 <form>
                   <div class="form-group ">
@@ -162,25 +166,33 @@
                       %>
                     <p>
                   <div class="d-flex justify-content-between">
-                  <span><%= singleProduct.product_name %> (<%= product.quantity %>)</span>
+                  <span><%= singleProduct.product_name %> &nbsp; x &nbsp; <%= product.quantity %></span>
                   <span >₹<%=productPrice %></span>
                 </div>
                 <%}}); %>
                 
                 
-                <div class="d-flex justify-content-between">
-                  <p class="mb-2">Discount:</p>
-                  <p class="mb-2 text-success">-₹00.00</p>
-                </div>
+                
                 <div class="d-flex justify-content-between">
                   <p class="mb-2">GST:</p>
                   <%const GST= Math.round((18/100)* totalPrice *100)/100%>
                   <p class="mb-2"><%=GST%></p>
                 </div>
                 <div class="d-flex justify-content-between">
-                  <p class="mb-2">Shipping Charge:</p>
-                  <%const Shipping= 25 %>
-                  <p class="mb-2"><%=Shipping%></p>
+                  <p class="mb-2">Shipping:</p>
+                  <%if(totalPrice>=1000)
+                  {
+                    var Shipping= 25
+                  }else{
+                    var  Shipping= 0
+                  }%>
+                  <%if(totalPrice>=1000){
+                    %>
+                    <p class="mb-2"><%= Shipping%></p>
+                    <%
+                  } else {%>
+                    <p class="mb-2 color">Free shipping</p>
+                    <% } %>
                 </div>
                 <hr />
                 <div class="d-flex justify-content-between">
@@ -191,8 +203,10 @@
                 </div>
 
                 <div class="mt-3">
+                  <%if(productData.length!==0){ %>
                   <a href="/checkout" class="btn btn-success w-100 shadow-0 mb-2"> Check Out </a>
                   <a href="/shop" class="btn btn-light w-100 border mt-2"> Back to shop </a>
+                  <% } %>
                 </div>
               </div>
             </div>

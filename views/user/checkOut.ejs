@@ -311,8 +311,14 @@
                                         <h6 class="font-size-14 m-0">Shipping Charge :</h6>
                                     </td>
                                     <td>
-                                        <% const ShippingCharge =25 %>
-                                        ₹ <%= ShippingCharge %>
+                                        <% if(totalSum>=1000){ var ShippingCharge= 25 %>
+                                            ₹ <%= ShippingCharge %>
+                                        <% } else{ var ShippingCharge = 0 %>
+                                            <p class="color">Free shipping</p>
+                                        <% }%>
+                                        
+                                        
+                                        
                                     
                                     </td>
                                 </tr>

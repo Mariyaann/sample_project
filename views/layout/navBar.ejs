@@ -23,9 +23,7 @@
                 <li><a class="nav-link" href="/"><i class='bx bx-search navbar-box-icon'></i></a></li>
                 <% if(!isLoggedIn ){%>
                     <li><a class="nav-link" href="/login"><i class='bx bx-user navbar-box-icon'></i></a></li>
-                <%} else {%>
-                    <li><a class="nav-link" href="/logout"><i class='bx bx-log-out-circle navbar-box-icon'></i></a></li>
-                <% }%>
+                <%} %>
                 <% if(isLoggedIn ){%>
                     <li class="nav-item dropdown">
                         <a class="nav-link user-list-div " href="#" id="userDropdown">
@@ -35,6 +33,7 @@
                             <a class="dropdown-item" href="/profile">Profile</a>
                             <a class="dropdown-item" href="/orders">Your Orders</a>
                             <a class="dropdown-item" href="/forgot">Forgot Password</a>
+                            <a class="dropdown-item" href="/logout">Log Out</a>
                         </div>
                     </li>
                     
