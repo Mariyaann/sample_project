@@ -7,7 +7,7 @@
  <%  } else if(notification.status=== 'success'){%>
   <script>successMessage("<%=notification.message%>")</script>
  <%  }%>
-
+<link rel="stylesheet" href="../../user/order-style.css">
  <div class="container-fluid pt-5 ">
     <div class="row">
         <div class="col-xl-8">
@@ -81,6 +81,27 @@
         </div>
 
         <div class="col-xl-4">
+            <div class="container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+            <div class="progress-step" id="step1">
+                <div class="icon">✔</div>
+                <div class="text">Order Confirmed</div>
+            </div>
+            <div class="progress-step" id="step2">
+                <div class="icon">✔</div>
+                <div class="text">Order Shipped</div>
+            </div>
+            <div class="progress-step" id="step3">
+                <div class="icon">✔</div>
+                <div class="text">Out for Delivery</div>
+            </div>
+            <div class="progress-step incomplete" id="step4">
+                <div class="icon">✔</div>
+                <div class="text">Order Delivered</div>
+            </div>
+        </div>
+    </div>
             <div class="mt-5 mt-lg-0">
                 <div class="card border shadow-none">
                     <div class="card-header bg-transparent border-bottom py-3 px-4">
@@ -130,3 +151,24 @@
     <!-- end row -->
     
 </div>
+
+<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const progressBar = document.getElementById("progress-bar");
+            const steps = document.querySelectorAll(".progress-step");
+
+            // Define the steps to animate
+            const completedSteps = 3; // Number of completed steps, adjust this value as needed
+
+            steps.forEach((step, index) => {
+                if (index < completedSteps) {
+                    step.classList.remove("incomplete");
+                } else {
+                    step.classList.add("incomplete");
+                }
+            });
+
+            const progressWidth = (completedSteps / (steps.length - 1)) * 100;
+            progressBar.style.width = `${progressWidth}%`;
+        });
+    </script>
