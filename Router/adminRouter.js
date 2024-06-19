@@ -11,7 +11,7 @@ const { adminSessionCheck, adminLoginCheck } = require('../Middleware/adminMiddl
 router.get('/', adminLoginCheck, adminController.loadAdminLogin)
 router.post('/login', adminLoginCheck, adminController.adminLogin)
 router.get('/dashboard', adminSessionCheck, adminController.loadDashBoard)
-
+router.get('/logout',adminController.logout)
 
 // ----- user managment ----------
 router.get('/clients', adminSessionCheck, adminController.clientsListLoad)
@@ -35,6 +35,8 @@ router.post('/update-product/:id', adminSessionCheck, upload.array('product_imag
 // -------------- Order Managment ------------ 
 router.get('/order',adminSessionCheck,orderController.showOrders)
 router.get('/updateOrderStatus/:id/:status',adminSessionCheck,orderController.updateOrderStatus)
+router.get('/orderDetails/:id',adminSessionCheck,orderController.singleOrderdetails)
+
 
 
 module.exports = router

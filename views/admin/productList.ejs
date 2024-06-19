@@ -36,14 +36,12 @@
               data-bs-toggle="modal" data-bs-target="#exampleModal">Add Product</a>
             <div>
               <form method="get" action="/admin/products">
-                <input
-                  class="mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                  placeholder="Product / Category" type="text" name="search" />
-                <button type="submit"
-                  class="px-4 py-2 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+                <input class="mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" placeholder="category Name" type="text" name="search" />
+                <button type="submit" class="px-4 py-2 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
                   <i class="bx bx-search"></i>
                 </button>
               </form>
+              
             </div>
           </div>
 
@@ -56,16 +54,27 @@
                     <th class="px-4 py-3 flexble">
                       Product
                       <div class="sort-div">
-                        <a href="/admin/clients?sort=asc&category=product_name"><i class="bx bxs-up-arrow"></i></a><a
-                          href="/admin/clients?sort=des&category=product_name"><i class="bx bxs-down-arrow"></i></a>
+                        <a href="/admin/products?order=asc&category=product_name"><i class="bx bxs-up-arrow"></i></a><a
+                          href="/admin/products?order=des&category=product_name"><i class="bx bxs-down-arrow"></i></a>
                       </div>
                     </th>
 
-                    <th class="px-4 py-3">Price</th>
+                    <th class="px-4 py-3"><div class="flx">Price
+                      <div class="sort-div">
+                      <a href="/admin/products?order=asc&category=product_price"><i class="bx bxs-up-arrow"></i></a><a
+                        href="/admin/products?order=des&category=product_price"><i class="bx bxs-down-arrow"></i></a>
+                    </div>
+                  </div></th>
                     <th class="px-4 py-3">Quantity</th>
-                    <th class="px-4 py-3">Stock</th>
+                    <th class="px-4 py-3"><div class="flx">Stock <div class="sort-div">
+                      <a href="/admin/products?order=asc&category=product_stock"><i class="bx bxs-up-arrow"></i></a><a
+                        href="/admin/products?order=des&category=product_stock"><i class="bx bxs-down-arrow"></i></a>
+                      </div></div></th>
                     <th class="px-4 py-3">Category</th>
-                    <th class="px-4 py-3">Time</th>
+                    <th class="px-4 py-3"><div class="flx">Time<div class="sort-div">
+                      <a href="/admin/products?order=asc&category=timestamp"><i class="bx bxs-up-arrow"></i></a><a
+                        href="/admin/products?order=des&category=timestamp"><i class="bx bxs-down-arrow"></i></a>
+                      </div></div></th>
                     <th class="px-4 py-3">Status</th>
                     <th class="px-4 py-3">Action</th>
                   </tr>
@@ -321,3 +330,5 @@
           </div>
 
           <script src="../../admin/productScript.js"></script>
+
+          

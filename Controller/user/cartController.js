@@ -287,7 +287,7 @@ const checkOut = async (req, res) => {
           );
         });
         const GST = Math.round((18 / 100) * totalSum * 100) / 100;
-        if(orderData.totalPrice>=1000){ var ShippingCharge = 25; }
+        if(orderData.totalPrice<=1000){ var ShippingCharge = 25; }
         else{ var ShippingCharge = 0;   }
         
         orderData.totalPrice = totalSum + GST + ShippingCharge;
@@ -306,13 +306,12 @@ const checkOut = async (req, res) => {
                   await cartCollection.findOneAndDelete({ _id: cartItem._id });
                 });
               }
-              globalNotification = {
-                status: "success",
-                message: "Order has been Placed Successfully",
-              };
+              
+              
             } catch (err) {
               console.log(err);
             }
+            res.render('./user/order-success')
           }
         } catch (err) {
           console.log(err);
@@ -346,8 +345,12 @@ const checkOut = async (req, res) => {
     return res.redirect("/checkout"); // Correct redirection on address validation failure
   }
 
-  res.redirect("/view-cart");
+  // res.redirect("/view-cart");
 };
+
+const successPage= (req,res)=>{
+    res.render('./user/order-success')
+}
 
 async function checkProductAvailability(cartItems) {
   const updatedCartItems = [];
@@ -447,4 +450,5 @@ module.exports = {
   removeCartItem,
   checkoutPage,
   checkOut,
+  successPage,
 };

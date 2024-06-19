@@ -13,16 +13,34 @@ let productCount;
 
 const listProducts = async (req, res) => {
     let notification={}
+    const search = req.query.search || ""
+    const category = req.query.category || ""
+    const order = req.query.order || ""
+    let query={}
     
     if(globalNotification.status)
         {
             notification=globalNotification;
             globalNotification={}
         }
-        console.log(notification)
+        if(category && order)
+            {
+                if(order==='asc')
+                     query[category]=1
+                else
+                    query[category]=-1
+            
+            }
+            else
+            {
+                query['timestamp']=-1
+                
+
+            }
     try {
-        const search = req.query.search || ""
+        console.log(search)
         if (search !== '') {
+
             productData = await productCollection.find({
                 $and: [
                     { product_status: { $ne: -1 } },
@@ -33,11 +51,11 @@ const listProducts = async (req, res) => {
                         ]
                     }
                 ]
-            }).sort({ timestamp: -1 });
+            }).sort(query);
             
         }
         else {
-            productData = await productCollection.find({ product_status: { $ne: -1 } }).sort({ timestamp: -1 });
+            productData = await productCollection.find({ product_status: { $ne: -1 } }).sort(query);
         }
 
         const categoryData = await getCategory()

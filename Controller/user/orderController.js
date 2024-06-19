@@ -29,7 +29,7 @@ const viewOrders= async (req,res)=>{
 
 // ------------------------- individual order view ------------- 
 const viewOrderDetails = async (req,res)=>{
-     let notification={}
+    let notification={}
      const customer_id = req.session.user;
     const order_id = req.params.id;
     try

@@ -78,3 +78,6 @@
     max-width: 100%;
     height: auto;
 }
+.flx{
+    display: flex; align-items: center;
+}

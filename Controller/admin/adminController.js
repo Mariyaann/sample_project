@@ -102,6 +102,11 @@ const loadDashBoard = async (req, res) => {
   res.render("./admin/dashboard",{userCount});
 };
 
+const logout = (req,res)=>{
+  req.session.destroy();
+  res.redirect('/admin')
+}
+
 function dateFormat(inputDate) {
   const formated = new Date(inputDate);
 
@@ -119,5 +124,6 @@ module.exports = {
   adminLogin,
   loadDashBoard,
   clientsListLoad,
-  updateClientStatus
+  updateClientStatus,
+  logout
 };

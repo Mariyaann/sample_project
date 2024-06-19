@@ -57,5 +57,6 @@ router.post('/check-out',userSessionCheck,cartController.checkOut)
 router.get('/orders',userSessionCheck,orderController.viewOrders)
 router.get('/view-order/:id',userSessionCheck,orderController.viewOrderDetails)
 router.get('/cancel-order/:id',userSessionCheck,orderController.cancelOrder)
+router.get('/success',userSessionCheck,cartController.successPage)
 
 module.exports = router     

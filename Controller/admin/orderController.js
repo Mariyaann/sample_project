@@ -1,20 +1,34 @@
 
-const orderCollecion = require('../../Schema/orderModel')
+const orderCollection = require('../../Schema/orderModel')
 let globalNotification ={}
 const { ObjectId } = require('mongodb');
 
 
 const showOrders = async (req,res)=>{
+    const category = req.query.category || '';
+    const order = req.query.order || '';
+    let query = {}
     let notification ={}
     if(globalNotification.status)
         {
             notification = globalNotification;
             globalNotification={}
         }
+        if(category && order)
+            {
+                if(order === 'asc')
+                    query[category]= 1
+                else
+                    query[category] = -1
+            }
+            else
+            {
+                query= {orderStatus:-1, createdAt:-1}
+            }
     try
     {
-        const orderDetails = await orderCollecion.find().sort({orderStatus:-1, createdAt:-1})
-        const pendingCount = await orderCollecion.find({orderStatus:'Pending'}).count()
+        const orderDetails = await orderCollection.find().sort(query)
+        const pendingCount = await orderCollection.find({orderStatus:'Pending'}).count()
         res.render('./admin/orderList',{orderDetails,notification,pendingCount,dateFormat})
     }
     catch(err)
@@ -32,7 +46,7 @@ const updateOrderStatus= async (req,res)=>{
             try
             {
                 
-                const updateStatus = await orderCollecion.findOneAndUpdate({ _id : new ObjectId (order_id) },{ $set:{orderStatus:status} }) 
+                const updateStatus = await orderCollection.findOneAndUpdate({ _id : new ObjectId (order_id) },{ $set:{orderStatus:status} }) 
                 if(updateStatus)
                     {
                         
@@ -52,6 +66,27 @@ const updateOrderStatus= async (req,res)=>{
             res.redirect('/admin/order')
         }
 }
+
+// ------------------------- Single order details --------------------------- 
+
+const singleOrderdetails = async (req,res) =>{
+    const order_id = req.params.id;
+    try
+    {
+        const productData = await orderCollection.findOne({ _id : order_id})
+        console.log(productData)
+        res.render('./admin/singleOrderDetails',{ productData})
+    }
+    catch(error)
+    {
+        globalNotification={
+            status: "error",
+            message: "Something went Wrong"
+        }
+
+        res.redirect('/admin/order')
+    }
+}
 // ------------------ Other Functions ----------------------------------------------------- 
 function dateFormat(inputDate) {
     const formated = new Date(inputDate);
@@ -63,6 +98,7 @@ function dateFormat(inputDate) {
 
 module.exports ={
     showOrders,
-    updateOrderStatus
+    updateOrderStatus,
+    singleOrderdetails
 }
 

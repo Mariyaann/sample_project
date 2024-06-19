@@ -7,17 +7,35 @@ let globalNotification={}
 // ----------------------------------- load all category ------------ 
 const listCategory = async (req, res) => {
   let notification={}
+  const category = req.query.category || ""
+  const order = req.query.order || ""
+  const search = req.query.search || "";
+  let query={ };
   if(globalNotification.status)
     {
       notification=globalNotification;
       globalNotification={}
     }
-  const search = req.query.search || "";
+  if(category && order)
+    {
+      
+      if(order==='asc')
+        query[category] = 1
+      else
+      query[category] = -1
+      
+    }
+    else
+    {
+      
+      query['timestamp']= -1
+    }
   try {
+    console.log(query)
     const categoryData = await categoryCollection.find({
       category_status: { $ne: -1 },
       category_name: { $regex: search, $options: "i" },
-    }).sort({ timestamp: -1 });
+    }).sort(query);
     const categoryCount = await getCategoryCount();
     res.render("./admin/categoryList", { categoryData, dateFormat, notification ,categoryCount});
   } catch (err) {
