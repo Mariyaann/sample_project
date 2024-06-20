@@ -360,6 +360,7 @@ const updatePassword = async (req, res) => {
     }
 };
 
+// ----------------------------- login with login ---------------------- 
 const googleLogin = async (req,res)=>{
   let actionResponce={}
   const { displayName, emails, phoneNumbers } = req.user;

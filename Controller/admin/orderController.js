@@ -4,6 +4,8 @@ let globalNotification ={}
 const { ObjectId } = require('mongodb');
 
 
+// ------------------------------ Show All Orders ------------------- 
+
 const showOrders = async (req,res)=>{
     const category = req.query.category || '';
     const order = req.query.order || '';
@@ -38,6 +40,8 @@ const showOrders = async (req,res)=>{
     }
 }
 
+// -------------------------------- Order accept, reject, cancel , deliver ---------------------- 
+
 const updateOrderStatus= async (req,res)=>{
     const order_id = req.params.id
     const status = req.params.status
@@ -45,11 +49,9 @@ const updateOrderStatus= async (req,res)=>{
         {
             try
             {
-                
                 const updateStatus = await orderCollection.findOneAndUpdate({ _id : new ObjectId (order_id) },{ $set:{orderStatus:status} }) 
                 if(updateStatus)
                     {
-                        
                         globalNotification={
                             status:'success',
                             message:"Order Status Updated"
@@ -67,7 +69,7 @@ const updateOrderStatus= async (req,res)=>{
         }
 }
 
-// ------------------------- Single order details --------------------------- 
+// ------------------------- Show Single order details --------------------------- 
 
 const singleOrderdetails = async (req,res) =>{
     const order_id = req.params.id;
@@ -87,7 +89,10 @@ const singleOrderdetails = async (req,res) =>{
         res.redirect('/admin/order')
     }
 }
-// ------------------ Other Functions ----------------------------------------------------- 
+
+
+// ------------------------------ formating timestamp to required format -------------------- 
+
 function dateFormat(inputDate) {
     const formated = new Date(inputDate);
   

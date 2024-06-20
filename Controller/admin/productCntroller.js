@@ -11,6 +11,8 @@ let globalNotification={}
 let productCount;
 
 
+// ---------------------- List all products -------------------------------- 
+
 const listProducts = async (req, res) => {
     let notification={}
     const search = req.query.search || ""
@@ -66,6 +68,10 @@ const listProducts = async (req, res) => {
         console.log("fetching product details" + err)
     }
 }
+
+
+
+// ----------------------------------- Add a new product -------------------- 
 
 const addProduct = async (req, res) => {
     const data = {
@@ -126,7 +132,9 @@ const addProduct = async (req, res) => {
     }
   };
   
-  
+
+//   ------------------------- Product disable, ebable , delete ------------------------ 
+
 const updateStatus = async (req, res) => {
     const id = req.params.id
     const status = req.params.status
@@ -160,7 +168,7 @@ const updateStatus = async (req, res) => {
     res.redirect(`/admin/products`)
 }
 
-// -------------------------------- Product editing ----------- 
+// -------------------------------- Product Editing ----------- 
 
 const editProduct = async (req, res) => {
     const notification = {}
@@ -192,6 +200,7 @@ const editProduct = async (req, res) => {
 }
 
 // ----------------------- Delete product image one by one ----------------------
+
 const deleteProductImage = async (req, res) => {
     const id = req.params.id;
     const index = req.params.index;
@@ -209,7 +218,10 @@ const deleteProductImage = async (req, res) => {
     }
     res.redirect(`/admin/editproduct/${id}`);
 };
+
+
 //   --------------------------- Update product --------------
+
 const updateProduct = async (req, res) => {
     const id = req.params.id
     const data = {
@@ -270,18 +282,21 @@ const updateProduct = async (req, res) => {
 
 const multerMiddle = multer.array("productImage", 4)
 
+// ------------------------------------------ Get all categorys -------------- 
 async function getCategory() {
     return await categoryCollection.find({ category_status: 1 }).sort({ timestamp: -1 })
 }
 
+// ----------------------------------------- Get Product count -------------------- 
 async function getProductCount()
 {
     return await productCollection.find({product_status:{$ne:-1}}).count()
 }
 
+// ----------------------- Date format -----------------------------------------
+
 function dateFormat(inputDate) {
     const formated = new Date(inputDate);
-
     const options = { year: "numeric", month: "short", day: "numeric" };
     const formattedDate = formated.toLocaleDateString("en-US", options);
     return formattedDate;

@@ -4,7 +4,7 @@ const dbConnection = require("../../Config/dbConnect");
 const { ObjectId } = require("mongodb");
 let globalNotification={}
 
-// ----------------------------------- load all category ------------ 
+// ----------------------------------- Showing all categorys  ----------------------- 
 const listCategory = async (req, res) => {
   let notification={}
   const category = req.query.category || ""
@@ -43,7 +43,7 @@ const listCategory = async (req, res) => {
   }
 };
 
-// --------------------------- add new category 
+// --------------------------- Adding new category ----------------------------------
 
 const addCategory = async (req, res) => {
   let category_name = req.body.category_name;
@@ -86,7 +86,7 @@ const addCategory = async (req, res) => {
   res.redirect(`/admin/category`)
 };
 
-// ------------------ Delete category -------------------------- 
+// ---------------------------------------- Deleting  A category -------------------------- 
 
 const removeCategory = async (req, res) => {
   const id = req.params.id
@@ -96,7 +96,7 @@ const removeCategory = async (req, res) => {
     globalNotification['message']='category deleted successfuly'
   }
   catch (err) {
-    // flas messgae go here
+    
     globalNotification['status']='error';
     globalNotification['message']='Something went wrong'
     console.log("unable to delete the category" + err)
@@ -132,7 +132,7 @@ const editCategory = async (req, res) => {
 }
 
 
-// ---------------------------- Update category ------------ 
+// ---------------------------- Update category ------------------------------- 
 
 const updateCategory = async (req, res) => {
   const id = req.params.id;
@@ -143,11 +143,10 @@ const updateCategory = async (req, res) => {
     const exists = await categoryCollection.findOne({ category_name: new_name , category_status : 1 })
     if (exists == null) {
       await categoryCollection.findByIdAndUpdate({ _id: new ObjectId(id) }, { $set: { category_name: new_name } }).then(() => {
-        // flas messgae go here
+       
         globalNotification['status']='success';
         globalNotification['message']='category Updated successfuly'
       }).catch((err) => {
-        // flas messgae go here
         globalNotification['status']='error';
         globalNotification['message']='Something went wrong'
 
@@ -161,7 +160,6 @@ const updateCategory = async (req, res) => {
     }
   }
   catch (err) {
-    // flas messgae go here
     globalNotification['status']='error';
     globalNotification['message']='Something went wrong'
 
@@ -173,6 +171,8 @@ const updateCategory = async (req, res) => {
 
 }
 
+// ------------------------------ formating timestamp to required format -------------------- 
+
 function dateFormat(inputDate) {
   const formated = new Date(inputDate);
 
@@ -180,6 +180,9 @@ function dateFormat(inputDate) {
   const formattedDate = formated.toLocaleDateString("en-US", options);
   return formattedDate;
 }
+
+// ---------------------------------- Get available category Count ---------------- 
+
 async function getCategoryCount()
 {
     return await categoryCollection.find({category_status:{$ne:-1}}).count()

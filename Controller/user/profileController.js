@@ -3,6 +3,8 @@ const clientCollection = require('../../Schema/clientModel')
 const validation = require('../../public/user/validation')
 let globalNotification ={}
 
+
+// -------------------------------- Show user Profile ------------------------ 
 const showProfile= async (req,res)=>{
     let notification= {}
     if(globalNotification.status){
@@ -20,6 +22,7 @@ const showProfile= async (req,res)=>{
     catch(err){    console.log(err)     }
 }
 
+// ------------------------------------- Update user Profile ---------------------- 
 const updateProfile = async (req,res)=>{
     const data={
         customer_name : req.body.userName,
@@ -58,6 +61,7 @@ const updateProfile = async (req,res)=>{
         }
 }
 
+// -------------------------------------- ADD  new address to user ------------------ 
 const addAddress =async (req,res)=>{
     const id= req.session.user
     const data= {
@@ -139,6 +143,9 @@ const editAddress= async(req,res)=>{
         res.redirect('/profile')
     }
 }
+
+// ---------------------------- Update existing address --------------------- 
+
 const updateAddress= async (req,res)=>{
 const id= req.session.user;
 const index = parseInt(req.params.index, 10);
@@ -190,6 +197,7 @@ if (validate.status) {
     }
 }
 
+// ------------------------------------- Remove an address ------------------------------ 
 const removeAddress = async (req,res)=>{
     const index = parseInt(req.params.index,10)
     const id= req.session.user

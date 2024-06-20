@@ -4,12 +4,18 @@ const dbConnection = require("../../Config/dbConnect");
 const { ObjectId } = require("mongodb");
 const productModel = require("../../Schema/productModel");
 
+
+// --------------------------------------- Login Page Loading ------------------- 
+
 const loadAdminLogin = (req, res) => {
   res.render("./admin/login", { error: null, message: "", formValues: {} });
 };
+
+// --------------------------------------- Admin Login ------------------------- 
+
 const adminLogin = (req, res) => {
-  const adminEmail = "admin@gmail.com";
-  const adminPassword = "admin@123";
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASS;
   const data = {
     email: req.body.adminEmail,
     password: req.body.adminPassword,
@@ -34,6 +40,15 @@ const adminLogin = (req, res) => {
     }
   }
 };
+
+// ------------------------------------------------ Dashboard loading ---------------------- 
+
+const loadDashBoard = async (req, res) => {
+  const userCount = await getUserCount();
+  res.render("./admin/dashboard", { userCount });
+};
+
+// ------------------------------------------------- User List Loading -------------------- 
 
 const clientsListLoad = async (req, res) => {
   const search = req.query.search || "";
@@ -70,12 +85,21 @@ const clientsListLoad = async (req, res) => {
         .skip(skipCount)
         .limit(dataCount);
     }
-    const userCount= await getUserCount()
-    res.render("./admin/userList", { clientData, dateFormat, page, responce ,userCount});
+    const userCount = await getUserCount();
+    res.render("./admin/userList", {
+      clientData,
+      dateFormat,
+      page,
+      responce,
+      userCount,
+    });
   } catch (err) {
     console.log(err);
   }
 };
+
+// -------------------------------------------------user Enable Disable Delete ------------------ 
+
 const updateClientStatus = async (req, res) => {
   const status = Number(req.params.status);
   const id = req.params.id; // Use response for consistency
@@ -97,16 +121,14 @@ const updateClientStatus = async (req, res) => {
   res.redirect(`/admin/clients`);
 };
 
-const loadDashBoard = async (req, res) => {
-  const userCount = await getUserCount()
-  res.render("./admin/dashboard",{userCount});
+// --------------------------------------------------- Admin Logout --------------------------- 
+
+const logout = (req, res) => {
+  req.session.destroy();
+  res.redirect("/admin");
 };
 
-const logout = (req,res)=>{
-  req.session.destroy();
-  res.redirect('/admin')
-}
-
+// ---------------------------------------------------- Format Timestamp -------------------- 
 function dateFormat(inputDate) {
   const formated = new Date(inputDate);
 
@@ -115,8 +137,9 @@ function dateFormat(inputDate) {
   return formattedDate;
 }
 
-async function getUserCount(){
-  return await clientCollection.find({customer_status:{$ne:-1}}).count()
+// ----------------------------------------------------- Get count of total active users --------------------- 
+async function getUserCount() {
+  return await clientCollection.find({ customer_status: { $ne: -1 } }).count();
 }
 
 module.exports = {
@@ -125,5 +148,5 @@ module.exports = {
   loadDashBoard,
   clientsListLoad,
   updateClientStatus,
-  logout
+  logout,
 };

@@ -2,6 +2,8 @@ const productCollection = require('../../Schema/productModel')
 const categoryCollection= require('../../Schema/categoryModel')
 const { query } = require('express')
 
+// ------------------------- SHOP page ----------------------------------- 
+
 const showShopPage = async (req, res) => {
   const category = req.query.category || ""
   const sortby = req.query.sortby || ""
@@ -73,6 +75,9 @@ const showShopPage = async (req, res) => {
     }
     
 }
+
+// ----------------------- Apply filter to shop page -------------------------- 
+
 const showWIthFilter = async (req, res) => {
   const category = req.query.category || "";
   const data = {
