@@ -296,15 +296,23 @@ const checkOut = async (req, res) => {
         const GST = Math.round((18 / 100) * totalSum * 100) / 100;
         const ShippingCharge = totalSum <= 1000 ? 25 : 0;
         
-        orderData.totalPrice = totalSum + GST + ShippingCharge;
+        orderData.totalPrice = Math.round(totalSum + GST + ShippingCharge);
         orderData.totalQuantity = totalQuantity;
         orderData.address = addressData;
         orderData.paymentMethod = paymentMethod;
+        if(paymentMethod === 'razorpay')
+        orderData.orderStatus = 'Payment Pending';
+        else
         orderData.orderStatus = 'Pending';
         orderData.order_id = order_id;
 
         try {
           const addOrder = await orderCollection.insertMany(orderData);
+          if (addOrder) {
+            for (let cartItem of productData) {
+              await cartCollection.findOneAndDelete({ _id: cartItem._id });
+            }
+          }
 
           if (paymentMethod === 'razorpay') {
             const options = {
@@ -315,11 +323,7 @@ const checkOut = async (req, res) => {
             const razorpayOrder = await razorpay.orders.create(options);
             return res.render('./user/payment-page', { orderData, razorpayOrder });
           } else {
-            if (addOrder) {
-              for (let cartItem of productData) {
-                await cartCollection.findOneAndDelete({ _id: cartItem._id });
-              }
-            }
+            
             res.render('./user/order-success');
           }
         } catch (err) {
@@ -361,27 +365,35 @@ const successPage= (req,res)=>{
     res.render('./user/order-success')
 }
 
-// ----------------------- Razorpay Payment ------------------------------------- 
+// ----------------------------------- Update order successfull ----------------------------- 
+const updateOrderPayment = async (req,res) => {
+  const paymentId = req.params.id;
+  const orderId = Number(req.params.orderId);
+  const userId = req.session.user
+  try
+  {
+    const updateOrder = await orderCollection.findOneAndUpdate({customer_id : userId,order_id : orderId },{$set:{
+      orderStatus:'Pending', paymentId:paymentId}})
 
-async  function razorpayPaymentPage(order)
-{
-  const razorpay = new Razorpay({
-    key_id: 'rzp_test_1CXfduMW9euDd9',
-    key_secret: 'dWBgdxhz2Xul2cGWrli9UDh0',
-});
-const options = {
-  amount: order.totalPrice,  // amount in the smallest currency unit
-  currency: 'INR',
-  receipt: String(order_id),
-};
-try
-{
-  const order = await razorpay.orders.create(options);
+  }
+  catch( err){
+    console.log(err)
+  }
+  res.render('./user/order-success')
 }
-catch(err)
-{
-  console.log(err)
-}
+
+// ------------------------------- Payment verification ----------------------- 
+const paymentVerification = (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+  const hmac = crypto.createHmac('sha256', 'dWBgdxhz2Xul2cGWrli9UDh0');
+  hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+  const generatedSignature = hmac.digest('hex');
+  
+  if (generatedSignature === razorpay_signature) {
+    res.send('Payment verified');
+  } else {
+    res.status(400).send('Invalid signature');
+  }
 }
 
 // ------------------------------------ Product avaible or not checking --------------------------- 
@@ -487,4 +499,6 @@ module.exports = {
   checkoutPage,
   checkOut,
   successPage,
+  paymentVerification,
+  updateOrderPayment
 };

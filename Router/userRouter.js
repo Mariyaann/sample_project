@@ -65,6 +65,8 @@ router.get('/orders',userSessionCheck,orderController.viewOrders)
 router.get('/view-order/:id',userSessionCheck,orderController.viewOrderDetails)
 router.get('/cancel-order/:id',userSessionCheck,orderController.cancelOrder)
 router.get('/success',userSessionCheck,cartController.successPage)
+router.get('/verify-payment',userSessionCheck,cartController.paymentVerification)
+router.get('/payment-success/:id/:orderId',userSessionCheck,cartController.updateOrderPayment)
 
 
 module.exports = router     

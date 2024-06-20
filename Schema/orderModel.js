@@ -58,7 +58,7 @@ const schema = new mongoose.Schema({
     paymentMethod: {
         type: String,
         required: true,
-        enum: [ 'Cash on delivery','Razor pay', 'Wallet','credit or debit card']
+        enum: [ 'Cash on delivery','razorpay', 'Wallet','credit or debit card']
     },
     isCancelled: {
         type: Boolean,
@@ -70,7 +70,7 @@ const schema = new mongoose.Schema({
     }, 
     orderStatus: { 
         type: String, 
-        enum:['Confirmed', 'Pending', 'Delivered', 'Returned', 'Cancelled','Shipped']
+        enum:['Confirmed', 'Pending', 'Delivered', 'Returned', 'Cancelled','Shipped','Payment Pending']
     }
 },{timestamps:true})
 
