@@ -24,7 +24,7 @@
           // Redirect to success page
           var paymentId = response.razorpay_payment_id;
           var orderId = "<%= orderData.order_id %>";
-          window.location.href = "/payment-success/" + paymentId + "/" + orderId;
+          window.location.href = "/payment-success" ;
         },
         "prefill": {
           "name": "<%= orderData.address.customer_name %>",

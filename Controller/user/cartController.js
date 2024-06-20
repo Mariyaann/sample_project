@@ -296,7 +296,7 @@ const checkOut = async (req, res) => {
         const GST = Math.round((18 / 100) * totalSum * 100) / 100;
         const ShippingCharge = totalSum <= 1000 ? 25 : 0;
         
-        orderData.totalPrice = Math.round(totalSum + GST + ShippingCharge);
+        orderData.totalPrice = (totalSum + GST + ShippingCharge).toFixed(2);
         orderData.totalQuantity = totalQuantity;
         orderData.address = addressData;
         orderData.paymentMethod = paymentMethod;

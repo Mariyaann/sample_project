@@ -175,13 +175,13 @@
                 </div>
                 <div class="d-flex justify-content-between">
                   <p class="mb-2">Shipping:</p>
-                  <%if(totalPrice<=1000)
+                  <%if(totalPrice<=1000 && totalPrice>0)
                   {
                     var Shipping= 25
                   }else{
                     var  Shipping= 0
                   }%>
-                  <%if(totalPrice<=1000){
+                  <%if(totalPrice<=1000 && totalPrice>0){
                     %>
                     <p class="mb-2"><%= Shipping%></p>
                     <%
