@@ -71,6 +71,7 @@ const cancelOrder= async (req,res)=>{
                             status:'success',
                             message: 'Order Canceled Successfully'
                         }  
+                        res.redirect('/orders')
                     }
 
                   }catch(err)

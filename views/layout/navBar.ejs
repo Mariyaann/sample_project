@@ -15,12 +15,15 @@
                 <li><a class="nav-link" href="/shop">Shop</a></li>
                 <li><a class="nav-link" href="/#why-choose-section">About us</a></li>
                 <li><a class="nav-link" href="/#footer-section">Contact us</a></li>
+                <li class="undeline-none"><a class="nav-link search-nav-bar" href="#">
+                    <input type="text" id="search-input" class="search-input" value="" placeholder="Product / Category" autocomplete="off"><i class='bx bx-search navbar-box-icon' onclick="serchProduct()"></i>
+                </a></li>
+                
             </ul>
             <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
 
                 <li><a class="nav-link" href="/"><i class='bx bx-heart navbar-box-icon ' ></i></a></li>
                 <li><a class="nav-link" href="/view-cart"><i class='bx bx-cart-alt navbar-box-icon'></i></a></li>
-                <li><a class="nav-link" href="/"><i class='bx bx-search navbar-box-icon'></i></a></li>
                 <% if(!isLoggedIn ){%>
                     <li><a class="nav-link" href="/login"><i class='bx bx-user navbar-box-icon'></i></a></li>
                 <%} %>
@@ -49,3 +52,16 @@
     </div>
         
 </nav>
+
+<script>
+    function serchProduct()
+{
+    
+	const search_input = document.getElementById('search-input').value
+    console.log(search_input)
+    if(search_input && search_input !=='')
+    {
+        window.location.href=`/shop?search=${search_input}`
+    }
+}
+</script>

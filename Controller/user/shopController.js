@@ -7,6 +7,7 @@ const { query } = require('express')
 const showShopPage = async (req, res) => {
   const category = req.query.category || ""
   const sortby = req.query.sortby || ""
+  const search = req.query.search || ""
     try
     {
         const categoryData= await productCollection.aggregate([
@@ -34,6 +35,20 @@ const showShopPage = async (req, res) => {
               category_id:category
             }
           }
+          else if(search)
+            {
+              query= {
+                $and: [
+                    { product_status: { $ne: -1 } },
+                    {
+                        $or: [
+                            { product_name: { $regex: search, $options: 'i' } },
+                            { category_name: { $regex: search, $options: 'i' } }
+                        ]
+                    }
+                ]
+            }
+            }
           else{
             query= {product_status:1
             }
