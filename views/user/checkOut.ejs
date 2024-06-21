@@ -18,7 +18,7 @@
 
     <div class="row">
         <div class="col-xl-7">
-            <form action="/check-out" method="post">
+            <form action="/check-out" method="post" id="check-out-form">
             <div class="card">
                 <div class="card-body">
                     <ol class="activity-checkout mb-0 px-4 mt-3">
@@ -242,7 +242,7 @@
                 </div> <!-- end col -->
                 <div class="col">
                     <div class="text-end mt-2 mt-sm-0">
-                        <button type="submit"  class="btn btn-success" >
+                        <button type="submit" id="procced-button" class="btn btn-success" data-user='<%=userData.customer_name %>' data-email='<%=userData.customer_emailid%>'>
                             <i class="mdi mdi-cart-outline me-1"></i> Procced </button>
                     </div>
                 </div> <!-- end col -->
@@ -344,6 +344,7 @@
     <!-- end row -->
     
 </div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     
     function changeAddress(address)
@@ -364,4 +365,86 @@
         pincode.value=address.pincode
         
     }
+
+    const procced_button= document.getElementById('procced-button')
+    procced_button.addEventListener('click',(e)=>{
+        e.preventDefault();
+        const username = document.getElementsByName('customer_name')[0].value
+        const email = document.getElementsByName('customer_emailid')[0].value
+        const phone = document.getElementsByName('phonenumber')[0].value
+        const paymentMethod= document.getElementById('pay-methodoption1');
+        if(paymentMethod.checked  && paymentMethod.value==='razorpay')
+        {
+            
+            const URL = '/razorpay'
+            fetch(URL,{
+                method:'POST',
+                headers:{
+                    "Content-Type": "application/json"
+                },
+                body : JSON.stringify({
+                    customer_name : document.getElementsByName('customer_name')[0].value,
+                    customer_emailid : document.getElementsByName('customer_emailid')[0].value,
+                    building : document.getElementsByName('building')[0].value,
+                    street : document.getElementsByName('street')[0].value,
+                    city : document.getElementsByName('city')[0].value,
+                    country : document.getElementsByName('country')[0].value,
+                    pincode : document.getElementsByName('pincode')[0].value,
+                    landmark : document.getElementsByName('landmark')[0].value,
+                    phonenumber : document.getElementsByName('phonenumber')[0].value
+                })
+            }).then((res) => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error(err.message); });
+            }
+            return res.json();
+        }).then((data) => {
+            
+            if (data.orderID) {
+                const options = {
+                    "key": "rzp_test_1CXfduMW9euDd9",
+                    "amount": data.totalPrice * 100,
+                    "currency": "INR",
+                    "name": "PURE QOQO",
+                    "order_id": data.orderID,
+                    "prefill": {
+                        "name": document.getElementsByName('customer_name')[0].value,
+                        "email": document.getElementsByName('customer_emailid')[0].value,
+                        "contact": document.getElementsByName('phonenumber')[0].value
+                    },
+                    "notes": {
+                        "address": "Razorpay Corporate Office"
+                    },
+                    "theme": {
+                        "color": "#6351CE"
+                    },
+                    "handler": function (response) {
+                        // Handle successful payment here
+                        console.log('Payment successful:', response);
+                        
+                        // Submit the form
+                        document.getElementById('check-out-form').submit();
+                    },
+                    "modal": {
+                        "ondismiss": function () {
+                            console.log("Payment failed or was dismissed.");
+                            window.location.href = `/checkout`;
+                        }
+                    }
+                };
+
+                const rzp1 = new Razorpay(options);
+                rzp1.open();
+            }else {
+                            throw new Error("Order ID not received");
+                        }
+
+        }).catch((err) => {
+            errorNotification(err.message);
+        });
+        }
+        else{
+            document.getElementById('check-out-form').submit();
+        }
+    })
 </script>

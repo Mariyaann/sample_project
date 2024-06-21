@@ -215,9 +215,103 @@ const checkoutPage = async (req, res) => {
   }
 };
 
-// ------------------------ Product Checkout ----------------------------- 
 
-const checkOut = async (req, res) => {
+// -------------------------- razorpay payment ------------------------
+
+const razorpayPayment = async (req,res)=>{
+  const userId = req.session.user;
+  const addressData = {
+    customer_name: req.body.customer_name,
+    customer_emailid: req.body.customer_emailid,
+    building: req.body.building,
+    street: req.body.street,
+    city: req.body.city,
+    country: req.body.country,
+    pincode: Number(req.body.pincode),
+    landmark: req.body.landmark,
+    phonenumber: Number(req.body.phonenumber),
+  };
+  let addressValid = addressValidation(addressData);
+  if (addressValid.status) {
+    let cartData = await cartCollection.find({
+      customer_id: new ObjectId(userId),
+      cart_status: 1,
+    });
+    await checkProductAvailability(cartData);
+    let productData = await cartCollection.aggregate([
+      { $match: { customer_id: new ObjectId(userId), cart_status: 1 } },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'product_id',
+          foreignField: '_id',
+          as: 'product_data',
+        },
+      },
+    ]);
+    if (productData.length !== 0) {
+      let totalSum = 0;
+      let totalQuantity = 0;
+      
+
+      for (let product of productData) {
+        let productDetail = product.product_data[0];
+
+        
+
+        let singleProduct = {
+          product_quantity: product.quantity,
+          product_price: productDetail.product_price
+        };
+
+        totalSum += singleProduct.product_quantity * singleProduct.product_price;
+        
+      }
+
+      const GST = Math.round((18 / 100) * totalSum * 100) / 100;
+      const ShippingCharge = totalSum <= 1000 ? 25 : 0;
+      
+      let totalPrice = (totalSum + GST + ShippingCharge).toFixed(2);
+      if (totalPrice > 0) {
+        
+        const amountInPaise = Math.round(totalPrice * 100); // Round to nearest integer
+        const instance = new Razorpay({
+          key_id: 'rzp_test_1CXfduMW9euDd9',
+          key_secret: 'dWBgdxhz2Xul2cGWrli9UDh0',
+        });
+        instance.orders.create({
+            amount: amountInPaise, // Amount in paise
+            currency: "INR",
+            receipt: "receipt#1",
+        }, (err, order) => {
+            if (err) {
+                // Log the complete error object for debugging
+                console.error('Failed to create order:', err);
+                // Send a detailed error message to the client
+                return res.status(500).json({ message: `Failed to create order: ${err.message}` });
+            }
+    
+            // If there is no error then send back the order id and total price
+            return res.status(200).json({ orderID: order.id, totalPrice: totalPrice });
+        });
+    } else {
+        res.status(400).json({ message: 'Cart is empty' });
+    }
+
+    } else {
+      res.status(400).json({ message: 'Cart is empty'});
+    }
+
+  }
+  else
+  {
+    console.log(addressValid.message)
+    res.status(400).json({ message: addressValid.message });
+  }
+}
+
+// ------------------------------- Razorpy order ----------------------- 
+const razorpayOrder = async (req,res)=>{
   const userId = req.session.user;
   const addressData = {
     customer_name: req.body.customer_name,
@@ -234,16 +328,8 @@ const checkOut = async (req, res) => {
   const order_id = Math.floor(100000 + Math.random() * 900000);
   const paymentMethod = req.body.pay_method;
 
-  // Validate address
-  let addressValid = addressValidation(addressData);
-
-  if (addressValid.status) {
     try {
-      let cartData = await cartCollection.find({
-        customer_id: new ObjectId(userId),
-        cart_status: 1,
-      });
-      await checkProductAvailability(cartData);
+      
 
       let productData = await cartCollection.aggregate([
         { $match: { customer_id: new ObjectId(userId), cart_status: 1 } },
@@ -350,13 +436,146 @@ const checkOut = async (req, res) => {
       };
       console.log(err);
     }
-  } else {
-    globalNotification = {
-      status: 'error',
-      message: addressValid.message,
-    };
-    return res.redirect('/checkout');
+  
+}
+// ------------------------ Product Checkout ----------------------------- 
+
+const checkOut = async (req, res) => {
+  const userId = req.session.user;
+  const addressData = {
+    customer_name: req.body.customer_name,
+    customer_emailid: req.body.customer_emailid,
+    building: req.body.building,
+    street: req.body.street,
+    city: req.body.city,
+    country: req.body.country,
+    pincode: req.body.pincode,
+    landmark: req.body.landmark,
+    phonenumber: Number(req.body.phonenumber),
+  };
+
+  const order_id = Math.floor(100000 + Math.random() * 900000);
+  const paymentMethod = req.body.pay_method;
+
+  if(paymentMethod ==='Cash on delivery'){
+      let addressValid = addressValidation(addressData);
+      if(!addressValid.status)
+        {
+            globalNotification = {
+              status: 'error',
+              message: addressValid.message,
+            };
+            return res.redirect('/checkout');
+          
+        }
+        else
+        {
+          try {
+            let cartData = await cartCollection.find({
+              customer_id: new ObjectId(userId),
+              cart_status: 1,
+            });
+            await checkProductAvailability(cartData);
+        }
+        catch (err) {
+      globalNotification = {
+        status: 'error',
+        message: 'Something went wrong',
+      };
+      console.log(err);
+    }
+    }
+
   }
+   
+
+      let productData = await cartCollection.aggregate([
+        { $match: { customer_id: new ObjectId(userId), cart_status: 1 } },
+        {
+          $lookup: {
+            from: 'products',
+            localField: 'product_id',
+            foreignField: '_id',
+            as: 'product_data',
+          },
+        },
+      ]);
+
+      if (productData.length !== 0) {
+        let totalSum = 0;
+        let totalQuantity = 0;
+        let orderData = {
+          customer_id: userId,
+          products: [],
+        };
+
+        for (let product of productData) {
+          let productDetail = product.product_data[0];
+
+          let productImage =
+            productDetail.product_image &&
+            productDetail.product_image.length > 0
+              ? productDetail.product_image[0]
+              : null;
+
+          let singleProduct = {
+            product_id: productDetail._id,
+            product_name: productDetail.product_name,
+            product_category: productDetail.category_name,
+            product_quantity: product.quantity,
+            product_price: productDetail.product_price,
+            product_image: productImage,
+          };
+
+          totalSum += singleProduct.product_quantity * singleProduct.product_price;
+          totalQuantity += singleProduct.product_quantity;
+          orderData.products.push(singleProduct);
+
+          await productCollection.updateOne(
+            { _id: singleProduct.product_id },
+            { $inc: { product_stock: -singleProduct.product_quantity } }
+          );
+        }
+
+        const GST = Math.round((18 / 100) * totalSum * 100) / 100;
+        const ShippingCharge = totalSum <= 1000 ? 25 : 0;
+        
+        orderData.totalPrice = (totalSum + GST + ShippingCharge).toFixed(2);
+        orderData.totalQuantity = totalQuantity;
+        orderData.address = addressData;
+        orderData.paymentMethod = paymentMethod;
+        
+        orderData.orderStatus = 'Pending';
+        orderData.order_id = order_id;
+
+        try {
+          const addOrder = await orderCollection.insertMany(orderData);
+          if (addOrder) {
+            for (let cartItem of productData) {
+              await cartCollection.findOneAndDelete({ _id: cartItem._id });
+            }
+          }
+            res.render('./user/order-success');
+          
+        } catch (err) {
+          console.log(err);
+          await productCollection.updateOne(
+            { _id: singleProduct.product_id },
+            { $inc: { product_stock: singleProduct.product_quantity } }
+          );
+          globalNotification = {
+            status: 'error',
+            message: 'Something went wrong. Please Try Again',
+          };
+        }
+      } else {
+        globalNotification = {
+          status: 'error',
+          message: 'Cart is empty add something to Cart',
+        };
+      }
+    
+  
 };
 
 // --------------------------- Order Success page ----------------------------- 
@@ -500,5 +719,7 @@ module.exports = {
   checkOut,
   successPage,
   paymentVerification,
-  updateOrderPayment
+  razorpayPayment,
+  updateOrderPayment,
+  razorpayOrder
 };
