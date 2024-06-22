@@ -131,6 +131,7 @@ const viewCart = async (req, res) => {
           },
         },
       ]);
+
     }
 
     res.render("./user/cart", { productData, notification });
@@ -578,6 +579,66 @@ const checkOut = async (req, res) => {
   
 };
 
+// -------------------------------- Update the quantity of cart products -------------------------
+
+const updateCartQantity = async (req,res)=>{
+    const cartId = req.params.id;
+    const quantity = req.body.quantity;
+    const userId = req.session.user
+    let response={}
+    if(cartId && quantity){
+      productData = await cartCollection.aggregate([
+        { $match: { customer_id: new ObjectId(userId), _id : new ObjectId(cartId) } },
+        {
+          $lookup: {
+            from: "products", // Name of the collection to join
+            localField: "product_id", // Field from the input documents
+            foreignField: "_id", // Field from the documents of the "from" collection
+            as: "product_data", // Output array field
+          },
+        },
+      ]);
+      
+      
+      console.log("------------------------++++++++++",)
+      if(productData.length )
+        {
+          let product =productData[0].product_data
+          if(quantity >0 && quantity<=product[0].product_stock)
+            {
+              await cartCollection.findOneAndUpdate({
+                _id: new ObjectId(cartId), customer_id: new ObjectId(userId)
+              },{
+                $set:{
+                  quantity: quantity
+                }
+              })
+
+              response ={
+                status : 'Suceess',
+                message:"Quantity updated"
+              }
+            }
+        }
+        else{
+      response ={
+        status : 'error',
+        message:"Not valid details"
+      }}
+
+      
+    }
+    else
+    {
+      response ={
+        status : 'error',
+        message:"Not valid details"
+      }
+    }
+    res.json(response);
+}
+
+
 // --------------------------- Order Success page ----------------------------- 
 
 const successPage= (req,res)=>{
@@ -614,6 +675,38 @@ const paymentVerification = (req, res) => {
     res.status(400).send('Invalid signature');
   }
 }
+
+// ------------------------------- count of items in cart -------------------------- 
+
+const getCartCount = async (req, res) => {
+  try {
+      const user_id = req.session.user;
+      if (!user_id) {
+          return res.status(400).json({ error: 'User not logged in' });
+      }
+
+      // Fetch cart data
+      let cartData = await cartCollection.find({
+          customer_id: new ObjectId(user_id),
+          cart_status: 1,
+      })
+
+      // Check product availability
+      await checkProductAvailability(cartData);
+
+      // Count items in the cart
+      const itemCount = await cartCollection.find({
+          customer_id: new ObjectId(user_id)
+      }).count();
+
+      res.status(200).json(itemCount);
+  } catch (error) {
+      console.error('Error fetching cart count:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
 
 // ------------------------------------ Product avaible or not checking --------------------------- 
 
@@ -710,6 +803,8 @@ async function productExist(productId, userId) {
   return responce;
 }
 
+
+
 module.exports = {
   addToCart,
   viewProduct,
@@ -721,5 +816,7 @@ module.exports = {
   paymentVerification,
   razorpayPayment,
   updateOrderPayment,
-  razorpayOrder
+  razorpayOrder,
+  updateCartQantity,
+  getCartCount
 };

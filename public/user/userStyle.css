@@ -1066,3 +1066,27 @@ a{
   -webkit-transition: .15s all ease-out;
   -o-transition: .15s all ease-out;
   transition: .15s all ease-out; } 
+
+  .badge {
+    padding-left: 20px;
+    padding-right: 9px;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    -webkit-border-radius: 9px;
+    -moz-border-radius: 9px;
+    border-radius: 9px;
+  }
+  
+  .label-warning[href],
+  .badge-warning[href] {
+    background-color: #c67605;
+  }
+  #lblCartCount {
+      font-size: 12px;
+      background: #f8b810;
+      color: #fff;
+      padding: 0 5px;
+      vertical-align: top;
+      margin-top: -7px;
+      margin-left: -10px; 
+  }

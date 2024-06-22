@@ -41,6 +41,7 @@ router.get('/shop/',shopController.showShopPage)
 router.post('/shop/',shopController.showWIthFilter)
 
 
+
 // -------------------------- Profile Section ----------------- 
 router.get('/profile',userSessionCheck, profileController.showProfile)
 router.post('/update-profile',userSessionCheck,profileController.updateProfile)
@@ -58,6 +59,8 @@ router.get('/remove-cart-item/:id',userSessionCheck,cartController.removeCartIte
 router.get('/checkout',userSessionCheck,cartController.checkoutPage)
 router.post('/check-out',userSessionCheck,cartController.checkOut)
 router.get('/view-product/:id',cartController.viewProduct)
+router.post('/update-cart-item/:id',userSessionCheck,cartController.updateCartQantity)
+router.get('/get-cartitem-count',userSessionCheck,cartController.getCartCount)
 
 // --------------------------- order section ----------------------- 
 

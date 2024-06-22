@@ -23,7 +23,11 @@
             <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
 
                 <li><a class="nav-link" href="/"><i class='bx bx-heart navbar-box-icon ' ></i></a></li>
-                <li><a class="nav-link" href="/view-cart"><i class='bx bx-cart-alt navbar-box-icon'></i></a></li>
+                <li><a class="nav-link" href="/view-cart"><i class='bx bx-cart-alt navbar-box-icon'></i>
+                    <% if(isLoggedIn ){%>
+                    <span class='badge badge-warning' id='lblCartCount' style="display: none"></span>
+                    <% } %>
+                </a></li>
                 <% if(!isLoggedIn ){%>
                     <li><a class="nav-link" href="/login"><i class='bx bx-user navbar-box-icon'></i></a></li>
                 <%} %>
@@ -63,5 +67,33 @@
     {
         window.location.href=`/shop?search=${search_input}`
     }
+
+   
 }
+
+URL = '/get-cartitem-count'
+    fetch(URL,{
+        method: 'GET'
+    }).then((responce)=>{
+        if(!responce.ok)
+        {
+            throw new Error('Cant Get the count')
+        }
+        else{
+            return responce.json()
+        }
+    }).then((data)=>{
+        console.log(data)
+        if(data>0)
+        {
+            document.getElementById('lblCartCount').innerHTML=data
+            document.getElementById('lblCartCount').style.display='inline-block'
+
+        }
+        
+    }).catch((err)=>{
+        console.log("Cant Get the count of the cart items", err)
+    })
+
+
 </script>
