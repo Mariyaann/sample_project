@@ -1089,4 +1089,9 @@ a{
       vertical-align: top;
       margin-top: -7px;
       margin-left: -10px; 
+  }.fav-color{
+    color: #f8b810;
+  }.fav-icon{
+    border: none;
+    background-color: transparent;
   }

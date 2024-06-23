@@ -6,6 +6,7 @@ const shopController = require('../Controller/user/shopController')
 const profileController = require('../Controller/user/profileController')
 const cartController = require('../Controller/user/cartController')
 const orderController = require('../Controller/user/orderController')
+const wishlistController = require('../Controller/user/wishlistController')
 const {userSessionCheck,isUserLogedIn}= require('../Middleware/userMiddleware');
 const cartCollection = require("../Schema/cartModel");
 require('../Service/googleAuth')
@@ -71,6 +72,11 @@ router.get('/success',userSessionCheck,cartController.successPage)
 router.get('/verify-payment',userSessionCheck,cartController.paymentVerification)
 router.post('/razorpay',userSessionCheck,cartController.razorpayPayment)
 router.post('/razorpay-order',userSessionCheck,cartController.razorpayOrder)
+
+
+// ---------------------------- wishlist section -------------------------------- 
+
+router.post('/add-to-favorites', userSessionCheck, wishlistController.addWishlist)
 
 
 
