@@ -282,7 +282,7 @@ const verifyEmail = async (req, res) => {
 };
 
 const passwordOtpVerify= (req,res)=>{
-    const actionResponce = {};
+    let actionResponce = {};
   const userOTP = req.body.userOTP;
   if ( req.session.OTP && userOTP && Number(req.session.OTP) === Number(userOTP)
   ) {

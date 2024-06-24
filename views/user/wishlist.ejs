@@ -1,0 +1,82 @@
+<%- include('../layout/header') %>
+<%- include('../layout/navBar') %>
+
+<% 
+  const currentDate = new Date(); 
+  const twoWeeksAgo = new Date(currentDate); 
+  twoWeeksAgo.setDate(currentDate.getDate() - 14); // Fix: Properly setting two weeks ago
+%>
+ <div class="untree_co-section product-section before-footer-section shop-container">
+<div class="container mt-5">
+  <div class="row">
+    <% if (wishlistData.length === 0) { %>
+      
+      <div class="col-8 m-auto text-center mt-5 empty-w-list" >
+        <img src="../../user/assets/web-img/empty-wishlist.png" alt="" class="w-80">
+        <h6 class="mt-5">Start adding your favorite items to keep track of the things you love!</h6>
+        <a href="/shop" class="btn">Shop Now</a>
+    </div>
+    <% } else { 
+      wishlistData.forEach((datas) => {
+        const data = datas.product_data[0];
+        const img = data.product_image[0];
+        const itemDate = new Date(data.timestamp); // Fix: Move itemDate calculation outside of the HTML
+    %>
+    
+    <!-- Start Column 1 -->
+    <div class="col-1 col-md-3 col-lg-3 mb-5">
+      <a class="product-item" href="#">
+        <div class="w-100 product-img-container">
+          <% if (data.product_stock <= 0) { %>
+            <span class="out-of-stock">Out Of Stock</span>
+          <% } else if (data.product_stock <= 10) { %>
+            <span class="label-low-stock">Only <%= data.product_stock %> Left</span>
+          <% } else if (itemDate > twoWeeksAgo && itemDate <= currentDate) { %>
+            <span class="label-new">New Item</span>
+          <% } %>
+          <img src="../../<%= img %>" class="img-fluid product-thumbnail">
+        </div>
+        <div class="flex">
+          <p class="color-primary"><%= data.category_name %></p>
+          <div>
+            <button type="button" name="fav-icon" class="fav-icon" id="fav-icon" data-id="<%= datas._id %>" >
+                <i class='bx bxs-heart card-wish-icon fav-color'></i>
+            </button>
+          </div>
+        </div>
+        <h3 class="product-title"><%= data.product_name %></h3>
+        <h5 class="product-price color-primary">₹<%= data.product_price %></h5>
+        &nbsp;&nbsp;<%= data.product_quantity %>
+        <h3 class="product-price">Rating: <i class='bx bxs-star rating'></i> 4.5</h3>
+
+            <span class="icon-cross" id="icon-cross" data-id="<%= data._id %>">
+                <img src="../../user/assets/web-img/cart-img.png" class="img-fluid" width="80%">
+            </span>
+      </a>
+    </div>
+    <% }); } %>
+  </div>
+</div>
+</div>
+<script>
+    const favButton = document.getElementById('fav-icon');
+    favButton.addEventListener('click',(e)=>{
+        e.preventDefault()
+        const wishlistId = favButton.getAttribute('data-id')
+
+        fetch(`/wish-list-item-remove/${wishlistId}`,{
+            method:'GET',
+        }).then((responce)=>{ location.reload();  console.log(responce)} ).catch((err)=>console.log(err))
+    })
+        
+    const cartAddBtn = document.getElementById("icon-cross")
+    cartAddBtn.addEventListener('click',(e)=>{
+        e.preventDefault()
+        const productId = cartAddBtn.getAttribute('data-id');
+        fetch(`/add-to-cart/${productId}`,{
+            method:"GET"
+        }).then((res)=> console.log(res)).catch((err)=> console.log(err))
+    })
+
+
+</script>

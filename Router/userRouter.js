@@ -77,8 +77,8 @@ router.post('/razorpay-order',userSessionCheck,cartController.razorpayOrder)
 // ---------------------------- wishlist section -------------------------------- 
 
 router.post('/add-to-favorites', userSessionCheck, wishlistController.addWishlist)
-
-
+router.get('/wish-list',userSessionCheck,wishlistController.showWishlist)
+router.get('/wish-list-item-remove/:id',userSessionCheck,wishlistController.removeWishlistItem)
 
 
 
