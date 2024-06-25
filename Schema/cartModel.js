@@ -17,7 +17,8 @@ const cartSchema = new mongoose.Schema({
     },
     cart_status:{
         type: Number,
-        required: true
+        required: true,
+        default:1
     },
     timestamp:{
         type: Date,

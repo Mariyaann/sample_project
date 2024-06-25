@@ -73,7 +73,7 @@
     cartAddBtn.addEventListener('click',(e)=>{
         e.preventDefault()
         const productId = cartAddBtn.getAttribute('data-id');
-        fetch(`/add-to-cart/${productId}`,{
+        fetch(`/wishlist-to-cart/${productId}`,{
             method:"GET"
         }).then((res)=> console.log(res)).catch((err)=> console.log(err))
     })

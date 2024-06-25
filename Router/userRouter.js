@@ -79,6 +79,7 @@ router.post('/razorpay-order',userSessionCheck,cartController.razorpayOrder)
 router.post('/add-to-favorites', userSessionCheck, wishlistController.addWishlist)
 router.get('/wish-list',userSessionCheck,wishlistController.showWishlist)
 router.get('/wish-list-item-remove/:id',userSessionCheck,wishlistController.removeWishlistItem)
+router.get('/wishlist-to-cart/:id',userSessionCheck,wishlistController.wishlistToCart)
 
 
 

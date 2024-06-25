@@ -1,6 +1,7 @@
 const wishlistCollection = require('../../Schema/wishlistModel')
 const productCollection = require('../../Schema/productModel');
 const { ObjectId } = require('mongodb');
+const cartCollection = require('../../Schema/cartModel');
 
 // ----------------------- adding and remove  wishlist items ----------------- 
 const addWishlist = async (req, res) => {
@@ -19,8 +20,12 @@ const addWishlist = async (req, res) => {
   
     try {
       const checkWishList = await wishlistCollection.findOne(data);
-  
+      const checkCartList = await cartCollection.findOne(data)
+      if(checkCartList == null){
+
+      
       if (checkWishList == null) {
+        
         await wishlistCollection.insertMany(data);
         response.success = true;
         response.action = 'added';
@@ -30,6 +35,14 @@ const addWishlist = async (req, res) => {
         response.action = 'deleted';
       }
       res.status(200).json(response);  // Ensure JSON response
+    }
+    else
+    {
+        response.success = true;
+        response.action = 'cartIn';
+        res.status(200).json(response);
+    }
+      
     } catch (err) {
       console.log(err);
       res.status(400).json({ success: false, message: err.message });  // Ensure JSON response
@@ -57,7 +70,6 @@ const showWishlist = async (req,res)=>{
             },
           ]);
 
-            console.log(wishlistData)
         res.render('./user/wishlist',{  wishlistData})
     }
     catch(err){
@@ -72,7 +84,6 @@ const removeWishlistItem = async (req,res)=>{
     const responces={}
     try{
         const removeItem = await wishlistCollection.findOneAndDelete({_id:id})
-        console.log(removeItem)
         responces={
             message:'success'
         }
@@ -80,6 +91,60 @@ const removeWishlistItem = async (req,res)=>{
     } catch(err){ 
                 console.log(err)
                res.status('400').json(responces)    }
+}
+
+// --------------------------------------- add item from  wishlist to cart ------------------- 
+
+const wishlistToCart = async (req,res)=>{
+    const productId = req.params.id;
+    const userId = req.session.user;
+    let responce = {}
+    try{
+        const findProduct = await productCollection.findOne({_id : new ObjectId(productId),product_status: 1, product_status:{$gt:0} })
+        if(findProduct)
+            {
+                const data = {
+                    customer_id: userId,
+                    product_id: productId,
+                    quantity: 1,
+                  };
+                const addtoCart = await cartCollection.insertMany(data);
+                if(addtoCart)
+                {
+                    const removeWishlist = await wishlistCollection.findOneAndDelete({product_id : productId , customer_id: userId})
+                    responce ={ 
+                        status: success,
+                        message : " product added to  cart "
+                    }
+                    res.json(responce)
+                }
+                else
+            {
+                responce={
+                    status:error,
+                    message : 'Not able to add product'
+                }
+                res.json(responce)
+                
+            }
+            }
+            else
+            {
+                responce={
+                    status:error,
+                    message : 'out of stock'
+                }
+                res.json(responce)
+                
+            }
+
+
+
+    }catch(err){
+        console.log(err)
+    }
+    
+
 }
 
 async function checkWishlistStatus(userId)
@@ -105,5 +170,6 @@ async function checkWishlistStatus(userId)
 module.exports ={
     addWishlist,
     showWishlist,
-    removeWishlistItem
+    removeWishlistItem,
+    wishlistToCart
 }

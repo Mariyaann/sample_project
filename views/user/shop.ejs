@@ -150,6 +150,7 @@
 
     favButtons.forEach(button => {
       button.addEventListener('click', function (event) {
+        
         event.preventDefault(); // Prevent the default anchor behavior
 
         const productId = button.getAttribute('data-id');
@@ -177,6 +178,7 @@
   return response.json();  // Parse the response as JSON
 })
 .then(data => {
+  console.log("data", data)
   if (!data.success) {
     if (data.redirect) {
       window.location.href = data.redirect;
@@ -193,6 +195,10 @@
     button.innerHTML = "<i class='bx bxs-heart card-wish-icon fav-color'></i>";
   } else if (data.action === 'deleted') {
     button.innerHTML = "<i class='bx bx-heart card-wish-icon'></i>";
+  } else if(data.action === 'cartIn')
+  {
+    
+    notificationMessage("Product already in cart")
   }
 })
 .catch(error => console.error('Error:', error));
