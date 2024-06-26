@@ -8,8 +8,9 @@
 %>
  <div class="untree_co-section product-section before-footer-section shop-container">
 <div class="container mt-5">
+  
   <div class="row">
-    <% if (wishlistData.length === 0) { %>
+    <% if (!wishlistData || wishlistData.length === 0) { %>
       
       <div class="col-8 m-auto text-center mt-5 empty-w-list" >
         <img src="../../user/assets/web-img/empty-wishlist.png" alt="" class="w-80">
@@ -17,10 +18,14 @@
         <a href="/shop" class="btn">Shop Now</a>
     </div>
     <% } else { 
+      
       wishlistData.forEach((datas) => {
-        const data = datas.product_data[0];
-        const img = data.product_image[0];
-        const itemDate = new Date(data.timestamp); // Fix: Move itemDate calculation outside of the HTML
+
+        if (datas.product_data && datas.product_data[0]) {
+          const data = datas.product_data[0];
+          if (data.product_image && data.product_image[0]) {
+            const img = data.product_image[0];
+            const itemDate = new Date(data.timestamp); // Fix: Move itemDate calculation outside of the HTML
     %>
     
     <!-- Start Column 1 -->
@@ -39,7 +44,7 @@
         <div class="flex">
           <p class="color-primary"><%= data.category_name %></p>
           <div>
-            <button type="button" name="fav-icon" class="fav-icon" id="fav-icon" data-id="<%= datas._id %>" >
+            <button type="button" name="fav-icon" class="fav-icon" id="fav-icon" data-id="<%= data._id %>" >
                 <i class='bx bxs-heart card-wish-icon fav-color'></i>
             </button>
           </div>
@@ -54,7 +59,11 @@
             </span>
       </a>
     </div>
-    <% }); } %>
+    <% 
+          }
+        }
+      }); 
+    } %>
   </div>
 </div>
 </div>
@@ -78,5 +87,74 @@
         }).then((res)=> console.log(res)).catch((err)=> console.log(err))
     })
 
+
+    document.addEventListener('DOMContentLoaded', function () {
+            
+            const favButtons = document.querySelectorAll('.fav-icon');
+        
+            favButtons.forEach(button => {
+              button.addEventListener('click', function (event) {
+                
+                event.preventDefault(); // Prevent the default anchor behavior
+        
+                const productId = button.getAttribute('data-id');
+        
+                // Perform the fetch request to add the product to favorites
+                fetch('/add-to-favorites', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ productId: productId }),
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.text().then(text => {  // Read the response as text
+              try {
+                const err = JSON.parse(text);  // Try to parse the text as JSON
+                throw new Error(err.message);  
+              } catch (e) {
+                console.error('Unexpected response format:', text);  // Log the unexpected response
+                throw new Error('Unexpected response format');
+              }
+            });
+          }
+          return response.json();  // Parse the response as JSON
+        })
+        .then(data => {
+          console.log("data", data)
+          if (!data.success) {
+            if (data.redirect) {
+              window.location.href = data.redirect;
+            } else {
+              Swal.fire({
+                position: "top-end",
+                icon: "error",
+                text: "Something went wrong. Try Again",
+                showConfirmButton: false,
+                timer: 1500
+              });
+            }
+          } else if (data.action === 'added') {
+            button.innerHTML = "<i class='bx bxs-heart card-wish-icon fav-color'></i>";
+            location.reload();
+          } else if (data.action === 'deleted') {
+            button.innerHTML = "<i class='bx bx-heart card-wish-icon'></i>";
+            location.reload();
+          } else if(data.action === 'cartIn')
+          {
+            
+            notificationMessage("Product already in cart")
+          }
+        })
+        .catch(error => console.error('Error:', error));
+        
+        
+              });
+            });
+          });
+        
+        
+        
 
 </script>

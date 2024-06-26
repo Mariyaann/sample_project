@@ -4,6 +4,7 @@ const adminController = require('../Controller/admin/adminController')
 const categoryController = require('../Controller/admin/categoryController')
 const productController = require('../Controller/admin/productCntroller')
 const orderController = require('../Controller/admin/orderController')
+const coupenController = require('../Controller/admin/coupenController')
 const upload = require('../Middleware/multer');
 const { adminSessionCheck, adminLoginCheck } = require('../Middleware/adminMiddleware')
 
@@ -43,6 +44,15 @@ router.post('/update-product/:id', adminSessionCheck, upload.array('product_imag
 router.get('/order', adminSessionCheck, orderController.showOrders)
 router.get('/updateOrderStatus/:id/:status', adminSessionCheck, orderController.updateOrderStatus)
 router.get('/orderDetails/:id', adminSessionCheck, orderController.singleOrderdetails)
+
+
+// --------------------------------- Coupen managment -------------------------- 
+
+router.get('/coupens',adminSessionCheck, coupenController.showCoupen)
+router.post('/add-coupen',adminSessionCheck, coupenController.addCoupen)
+router.get('/removeCoupen/:id',adminSessionCheck, coupenController.removeCoupen)
+router.get('/editCoupen/:id',adminSessionCheck,coupenController.editCoupen)
+router.post('/update-coupen/:id',adminSessionCheck,coupenController.updateCoupen)
 
 
 

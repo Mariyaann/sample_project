@@ -44,7 +44,7 @@
                       <button class="btn btn-link px-2" onclick="changeInputValue(this, 'decrease', '<%= product._id %>')">
                         <i class="fas fa-minus"></i>
                       </button>
-                      <input id="stock-input-<%= product._id %>" data-product-id="<%= product._id %>" min="0" max="<%= product_data.product_stock %>" name="quantity" value="<%= product.quantity %>" type="number" class="form-control form-control-sm quantity-bar text-center" style="width:60px;">
+                      <input id="stock-input-<%= product._id %>" data-product-id="<%= product._id %>" min="0" max="<%= product_data.product_stock %>" name="quantity" value="<%= product.quantity %>" type="number" class="form-control form-control-sm quantity-bar text-center" style="width:60px;" readonly>
                       <button class="btn btn-link px-2" onclick="changeInputValue(this, 'increase', '<%= product._id %>')">
                         <i class="fas fa-plus"></i>
                       </button>
@@ -73,7 +73,7 @@
                       <button class="btn btn-link px-2" onclick="changeInputValue(this, 'decrease', '<%= product._id %>')">
                         <i class="fas fa-minus"></i>
                       </button>
-                      <input id="stock-input-<%= product._id %>" data-product-id="<%= product._id %>" min="0" max="<%= product_data.product_stock %>" name="quantity" value="<%= product.quantity %>" type="number" class="form-control form-control-sm quantity-bar text-center" style="width:60px;">
+                      <input id="stock-input-<%= product._id %>" data-product-id="<%= product._id %>" min="1" max="<%= product_data.product_stock %>" name="quantity" value="<%= product.quantity %>" type="number" class="form-control form-control-sm quantity-bar text-center" style="width:60px;">
                       <button class="btn btn-link px-2" onclick="changeInputValue(this, 'increase', '<%= product._id %>')">
                         <i class="fas fa-plus"></i>
                       </button>

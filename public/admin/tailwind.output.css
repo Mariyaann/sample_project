@@ -80,4 +80,6 @@
 }
 .flx{
     display: flex; align-items: center;
+}.sort-div a i{
+    font-size: 9px;
 }
