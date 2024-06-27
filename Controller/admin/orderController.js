@@ -1,5 +1,6 @@
 
 const orderCollection = require('../../Schema/orderModel')
+const walletCollection = require('../../Schema/walletModel')
 let globalNotification ={}
 const { ObjectId } = require('mongodb');
 
@@ -49,7 +50,33 @@ const updateOrderStatus= async (req,res)=>{
         {
             try
             {
+            
                 const updateStatus = await orderCollection.findOneAndUpdate({ _id : new ObjectId (order_id) },{ $set:{orderStatus:status} }) 
+                if (['razorpay', 'Wallet'].includes(updateStatus.paymentMethod) && status =='Cancelled') {
+                    const wallet_balance = updateStatus.totalPrice;
+                    const transaction_details = {
+                        wallet_amount: updateStatus.totalPrice,
+                        order_id: updateStatus.order_id,
+                        transactionType: 'Credited'
+                    };
+    
+                    const checkWallet = await walletCollection.findOne({ customer_id: updateStatus.customer_id });
+                    if (checkWallet) {
+                        await walletCollection.findOneAndUpdate(
+                            { _id: checkWallet._id },
+                            { 
+                                $inc: { wallet_balance: wallet_balance },
+                                $push: { transaction: transaction_details }
+                            }
+                        );
+                    } else {
+                        await walletCollection.create({
+                            customer_id: updateStatus.customer_id,
+                            wallet_balance: wallet_balance,
+                            transaction: [transaction_details]
+                        });
+                    }}
+                
                 if(updateStatus)
                     {
                         globalNotification={
@@ -60,6 +87,7 @@ const updateOrderStatus= async (req,res)=>{
             }
             catch(err)
             {
+                console.log(err)
                 globalNotification={
                     status:'error',
                     message:"Something went wrong. Try again"
