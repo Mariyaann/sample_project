@@ -10,7 +10,7 @@ const wishlistController = require('../Controller/user/wishlistController')
 const coupenController = require('../Controller/user/coupenController')
 const {userSessionCheck,isUserLogedIn}= require('../Middleware/userMiddleware');
 const cartCollection = require("../Schema/cartModel");
-require('../Service/googleAuth')
+require('../Service/googleAuth') 
 
 // ------------------------ Middldeware to check user loged in or not ------------------ 
 router.use(isUserLogedIn)

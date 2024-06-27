@@ -279,7 +279,8 @@ const razorpayPayment = async (req,res)=>{
       if(coupenCode && coupenCode !=="")
         {
           const coupenData = await coupenCollection.findOne({coupen_code:coupenCode});
-          if(coupenData)
+          const availabilityCheck = await orderCollection.findOne({ customer_id: userId, coupen_id: coupenData._id });
+          if(coupenData && !availabilityCheck)
             {
              if(coupenData.coupen_type == 'Flat OFF'  && totalPrice>=coupenData.coupen_amount_limit) 
               totalPrice= totalPrice- coupenData.coupen_offer_amount
@@ -559,6 +560,7 @@ const checkOut = async (req, res) => {
             { $inc: { product_stock: -singleProduct.product_quantity } }
           );
         }
+        
 
         const GST = Math.round((18 / 100) * totalSum * 100) / 100;
         const ShippingCharge = totalSum <= 1000 ? 25 : 0;
@@ -566,7 +568,8 @@ const checkOut = async (req, res) => {
         if(coupenCode)
           {
             const coupenData = await coupenCollection.findOne({coupen_code: coupenCode})
-            if(coupenData)
+            const availabilityCheck = await orderCollection.findOne({ customer_id: userId, coupen_id: coupenData._id });
+            if(coupenData && !availabilityCheck)
               {
                 if(coupenData.coupen_type === 'Flat OFF' &&  totalPrice>=coupenData.coupen_amount_limit)
                   {
@@ -574,9 +577,9 @@ const checkOut = async (req, res) => {
                   }else if(coupenData.coupen_type === 'Percentage' &&  totalPrice>=coupenData.coupen_amount_limit)
                   {
                     totalPrice = totalPrice -(totalPrice * (coupenData.coupen_offer_amount) ) 
-
                   }
                   totalPrice= totalPrice.toFixed(2)
+                orderData.isCoupen = true;
                 orderData.coupen_id = coupenData._id;
               }
               
@@ -626,18 +629,26 @@ const updateCartQantity = async (req,res)=>{
     const userId = req.session.user
     let response={}
     if(cartId && quantity){
-      productData = await cartCollection.aggregate([
-        { $match: { customer_id: new ObjectId(userId), _id : new ObjectId(cartId) } },
-        {
-          $lookup: {
-            from: "products", // Name of the collection to join
-            localField: "product_id", // Field from the input documents
-            foreignField: "_id", // Field from the documents of the "from" collection
-            as: "product_data", // Output array field
+      try
+      {
+        
+        productData = await cartCollection.aggregate([
+          { $match: { customer_id: new ObjectId(userId), _id : new ObjectId(cartId) } },
+          {
+            $lookup: {
+              from: "products", // Name of the collection to join
+              localField: "product_id", // Field from the input documents
+              foreignField: "_id", // Field from the documents of the "from" collection
+              as: "product_data", // Output array field
+            },
           },
-        },
-      ]);
-      
+        ]);
+
+        
+      }
+      catch(err){
+        console.log(err)
+      }
       
       if(productData.length )
         {

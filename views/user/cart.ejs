@@ -166,7 +166,7 @@ function changeInputValue(button, action, productId) {
 
 // Function to update the product quantity in the database
 function updateProductQuantity(productId, quantity) {
-  console.log(productId)
+  console.log(quantity)
     fetch(`/update-cart-item/${productId}`, {
         method: 'POST',
         headers: {
@@ -174,11 +174,8 @@ function updateProductQuantity(productId, quantity) {
         },
         body: JSON.stringify({ quantity: quantity })
     })
-    .then(response => {if(response.redirected)
-                {
-                    window.location.href = response.url;
-                }
-                response.json()})
+    .then(response => {
+                return response.json()})
     .then(data => {
         console.log('Update successful:', data);
     })
