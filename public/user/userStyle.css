@@ -1135,3 +1135,48 @@ a{
     border-color: #fff !important;
 
   }
+ /* ----------------------------- coupen ------------------  */
+ .coupon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8f9fa;
+  padding: 20px;
+  margin: 10px 0;
+  border: 1px solid #f9bf29;
+  border-radius: 5px;
+  
+}
+
+.coupon-left {
+  text-align: center;
+  border-right: 1px dashed #dee2e6;
+  padding-right: 20px;
+}
+
+.coupon-right {
+  padding-left: 20px;
+}
+
+.coupon-code {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.coupon-expiry {
+  color: #888;
+  font-size: 0.9em;
+}
+
+.coupon-button {
+  background-color: #f44336;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.coupon-button:hover {
+  background-color: #d32f2f;
+}

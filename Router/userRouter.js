@@ -7,6 +7,7 @@ const profileController = require('../Controller/user/profileController')
 const cartController = require('../Controller/user/cartController')
 const orderController = require('../Controller/user/orderController')
 const wishlistController = require('../Controller/user/wishlistController')
+const coupenController = require('../Controller/user/coupenController')
 const {userSessionCheck,isUserLogedIn}= require('../Middleware/userMiddleware');
 const cartCollection = require("../Schema/cartModel");
 require('../Service/googleAuth')
@@ -72,6 +73,7 @@ router.get('/success',userSessionCheck,cartController.successPage)
 router.get('/verify-payment',userSessionCheck,cartController.paymentVerification)
 router.post('/razorpay',userSessionCheck,cartController.razorpayPayment)
 router.post('/razorpay-order',userSessionCheck,cartController.razorpayOrder)
+router.get('/payment-success/:id/:orderId',userSessionCheck,cartController.updateOrderPayment)
 
 
 // ---------------------------- wishlist section -------------------------------- 
@@ -82,9 +84,9 @@ router.get('/wish-list-item-remove/:id',userSessionCheck,wishlistController.remo
 router.get('/wishlist-to-cart/:id',userSessionCheck,wishlistController.wishlistToCart)
 
 
+// ------------------------------ coupen section ----------------- 
 
-
-router.get('/payment-success/:id/:orderId',userSessionCheck,cartController.updateOrderPayment)
+router.post('/get-coupens', userSessionCheck, coupenController.getCoupen)
 
 
 module.exports = router     

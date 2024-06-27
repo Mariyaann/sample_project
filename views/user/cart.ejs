@@ -95,14 +95,18 @@
         <div class="card mb-3 border shadow-0">
           <div class="card-body">
             <form>
-              <div class="form-group">
-                <label class="form-label">Have coupon?</label>
-                <div class="input-group">
-                  <input type="text" class="form-control border" name="" placeholder="Coupon code" />
-                  <button class="btn btn-light border">Apply</button>
-                </div>
-              </div>
-            </form>
+      <div class="form-group">
+        <label class="form-label">Have coupon?</label>
+        <div class="input-group">
+          <input type="text" class="form-control border" name="" placeholder="Coupon code" id="coupen-box" />
+          <button class="btn btn-light border" onclick="applyCoupen()">Apply</button>
+        </div>
+        <p class="form-label text-end" id="view-coupen">View Coupons</p>
+        <div id="coupen-divs" style="display: none;">
+          <!-- Coupons will be inserted here dynamically -->
+        </div>
+      </div>
+    </form>
           </div>
         </div>
         <div class="card shadow-0 border">
@@ -146,7 +150,7 @@
             <div class="d-flex justify-content-between">
               <% totalPrice = totalPrice + GST + Shipping; %>
               <p class="mb-2">Total price:</p>
-              <p class="mb-2 fw-bold"><%= totalPrice %></p>
+              <p class="mb-2 fw-bold" id="total-price" data-price="<%= totalPrice %>"><%= totalPrice %></p>
             </div>
             <div class="mt-3">
               <% if (productData.length !== 0) { %>
@@ -194,4 +198,89 @@ function updateProductQuantity(productId, quantity) {
         console.error('Error:', error);
     });
 }
+
+const view_coupen = document.getElementById('view-coupen')
+const coupen_divs = document.getElementById('coupen-divs')
+const total_amount = document.getElementById('total-price').getAttribute('data-price')
+
+view_coupen.addEventListener('click', () => {
+  fetch('get-coupens', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ total_amount: total_amount })
+  })
+  .then(response => response.json())
+  .then(data => {
+    const couponDivs = document.getElementById('coupen-divs');
+    couponDivs.style.display = couponDivs.style.display === 'none' ? 'block' : 'none';
+
+    if (couponDivs.style.display === 'block') {
+      couponDivs.innerHTML = data.map(coupon => {
+        // Example conditional check based on coupon properties
+        let couponContent = '';
+        if (coupon.coupon_type === 'Flat OFF') {
+          couponContent = `
+            <a href="#" data-coupen-id='${coupon._id}' onclick='selectedCoupen("${coupon._id}","${coupon.coupen_code}")'><div class="coupon">
+              <div class="coupon-left">
+                <h2 class="color">${coupon.coupen_offer_amount}</h2>
+                <p>FLAT OFF</p>
+              </div>
+              <div class="coupon-right">
+                <div class="coupon-code color">
+                  <h5 class="color">${coupon.coupen_code}</h5>
+                  <small>Use the Coupen above orders ${coupon.coupen_amount_limit} </small>
+                </div>
+              </div>
+            </div>
+            </a>
+          `;
+        } else {
+          couponContent = `
+            <a href="#" data-coupen-id='${coupon._id}' onclick='selectedCoupen("${coupon._id}","${coupon.coupen_code}")'><div class="coupon">
+              <div class="coupon-left">coupen
+                <h2 class="color">${coupon.coupen_offer_amount}%</h2>
+                <p>DISCOUNT</p>
+              </div>
+              <div class="coupon-right">
+                <div class="coupon-code ">
+                  <h5 class="color">${coupon.coupen_code}</h5>
+                  <small>Use the Coupen above orders ${coupon.coupen_amount_limit} </small>
+                </div>
+               
+              </div>
+            </div></a>
+          `;
+        }
+        return couponContent;
+      }).join('');
+    } else {
+      couponDivs.innerHTML = '';
+    }
+  })
+  .catch(err => {
+    console.error('Error fetching coupons:', err);
+  });
+});
+
+
+
+
+function selectedCoupen(id,code) {
+
+  
+  document.getElementById('coupen-box').value= code
+  document.getElementById('coupen-box').setAttribute('data-coupen-id',id)
+  document.getElementById('coupen-divs').style.display='none'
+  }
+
+
+  function applyCoupen()
+  {
+    
+  }
+
+
+
 </script>
