@@ -164,7 +164,11 @@ document.addEventListener('DOMContentLoaded', function () {
   body: JSON.stringify({ productId: productId }),
 })
 .then(response => {
-  if (!response.ok) {
+  if(response.redirected)
+                {
+                    window.location.href = response.url;
+                }
+  else if (!response.ok) {
     return response.text().then(text => {  // Read the response as text
       try {
         const err = JSON.parse(text);  // Try to parse the text as JSON

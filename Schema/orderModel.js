@@ -64,6 +64,15 @@ const schema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isCoupen:{
+        type: Boolean,
+        default: false
+    },
+    coupen_id:{
+            type: mongoose.Schema.Types.ObjectId ,
+            ref:"Coupens",
+            required: false
+    },
     paymentId: {
         type: String,
         required: false

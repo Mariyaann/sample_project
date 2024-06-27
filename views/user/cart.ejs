@@ -174,7 +174,11 @@ function updateProductQuantity(productId, quantity) {
         },
         body: JSON.stringify({ quantity: quantity })
     })
-    .then(response => response.json())
+    .then(response => {if(response.redirected)
+                {
+                    window.location.href = response.url;
+                }
+                response.json()})
     .then(data => {
         console.log('Update successful:', data);
     })

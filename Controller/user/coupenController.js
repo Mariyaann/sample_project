@@ -16,12 +16,20 @@ const getCoupen = async (req, res) => {
 // --------------------- Get single coupen details --------------- 
 
 const getSingleCoupen = async (req,res)=>{
-  const coupen_code = req.body.coupen_code || ""
+  const coupen_code = req.body.coupen_code || "";
   if(coupen_code)
     {
       try{
           await checkCoupenStatus();
-          const coupenData = await coupenCollection.findOne({})
+          const coupenData = await coupenCollection.findOne({coupen_code:coupen_code})
+          if(coupenData)
+            {
+              res.json(coupenData)
+            }
+            else
+            {
+              res.status(400).json("No coupen Found with coupen code ")
+            }
       }
       catch(err)
       {
@@ -50,5 +58,6 @@ async function checkCoupenStatus() {
     }
 }
 module.exports ={
-    getCoupen
+    getCoupen,
+    getSingleCoupen
 }

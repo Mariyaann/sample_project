@@ -78,7 +78,11 @@
                             fetch(URL, {
                                 method: "GET"
                             }).then((response) => {
-                                if (response.ok) {
+                              if(response.redirected)
+                {
+                    window.location.href = response.url;
+                }
+                                else if (response.ok) {
                                     Swal.fire({
                                         icon: "success",
                                         title: "OTP Sended successfully"

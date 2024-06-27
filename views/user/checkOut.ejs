@@ -248,7 +248,7 @@
                 </div> <!-- end col -->
             </div> <!-- end row-->
         </div>
-    </form>
+    
         <div class="col-xl-5">
             
             <div class="card checkout-order-summary">
@@ -307,7 +307,14 @@
                                         ₹ <%= GST %>
                                     </td>
                                 </tr>
-
+                                <tr id="discount-div" >
+                                    <td colspan="2">
+                                        <h6 class="font-size-14 m-0">Discount:</h6>
+                                    </td>
+                                    <td>
+                                          <p id="discount-span">0</p>
+                                    </td>
+                                </tr>
                                 <tr>
                                     <td colspan="2">
                                         <h6 class="font-size-14 m-0">Shipping Charge :</h6>
@@ -317,13 +324,16 @@
                                             ₹ <%= ShippingCharge %>
                                         <% } else{ var ShippingCharge = 0 %>
                                             <p class="color">Free shipping</p>
-                                        <% }%>
+                                        <% }
+                                        const totalAmount =  totalSum + ShippingCharge + GST;
+                                        %>
                                         
                                         
                                         
                                     
                                     </td>
                                 </tr>
+                                
                                                               
                                     
                                 <tr class="bg-light">
@@ -331,7 +341,7 @@
                                         <h6 class="font-size-14 m-0 color">Total:</h6>
                                     </td>
                                     <td>
-                                        <span id="total-price " class="color" data-price ="<%= totalSum + ShippingCharge + GST %>"> ₹ <%= totalSum + ShippingCharge + GST %></span>
+                                        <p id="total-price" class="color" data-price="<%= totalAmount %>"> ₹ <%= totalAmount %></p>
                         
                                         
                                     </td>
@@ -344,25 +354,27 @@
             </div>
             <div class="card mb-3 border shadow-0">
           <div class="card-body">
-            <form>
+            
       <div class="form-group">
         <label class="form-label">Have coupon?</label>
         <div class="input-group">
-          <input type="text" class="form-control border" name="" placeholder="Coupon code" id="coupen-box" />
-          <button class="btn btn-light border" onclick="applyCoupen()">Apply</button>
+            <input type="text" class="form-control border" name="coupenCode" placeholder="Coupon code" id="coupen-box" value="" />
+            <button type="button" class="btn btn-light border" onclick="applyCoupen()">Apply</button>
         </div>
+        <div class="flex"><span><p class="form-label text-start" id="remove-coupen" onclick="removeCoupen('<%= totalAmount %>')" style="display:none;">Remove Coupons</p> </span>
         <p class="form-label text-end color" id="view-coupen">View Coupons</p>
+        </div>
         <div id="coupen-divs" style="display: none;">
           <!-- Coupons will be inserted here dynamically -->
         </div>
       </div>
-    </form>
           </div>
         </div>
+    </form>
         </div>
     </div>
     <!-- end row -->
-    
+
 </div>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
@@ -411,15 +423,20 @@
                     country : document.getElementsByName('country')[0].value,
                     pincode : document.getElementsByName('pincode')[0].value,
                     landmark : document.getElementsByName('landmark')[0].value,
-                    phonenumber : document.getElementsByName('phonenumber')[0].value
+                    phonenumber : document.getElementsByName('phonenumber')[0].value,
+                    coupen_code : document.getElementById('coupen-box').value
                 })
             }).then((res) => {
-            if (!res.ok) {
+                if(res.redirected)
+                {
+                    window.location.href = res.url;
+                }
+            else if (!res.ok) {
+                
                 return res.json().then(err => { throw new Error(err.message); });
-            }return res.json().then(err => { throw new Error(err.message); });
+            }
             return res.json();
         }).then((data) => {
-            
             if (data.orderID) {
                 const options = {
                     "key": "rzp_test_1CXfduMW9euDd9",
@@ -448,7 +465,7 @@
                     "modal": {
                         "ondismiss": function () {
                             console.log("Payment failed or was dismissed.");
-                            window.location.href = `/checkout`;
+                            // window.location.href = `/checkout`;
                         }
                     }
                 };
@@ -460,6 +477,7 @@
                         }
 
         }).catch((err) => {
+            console.log(err)
             errorNotification(err.message);
         });
         }
@@ -467,20 +485,26 @@
             document.getElementById('check-out-form').submit();
         }
     })
-
+    
 const view_coupen = document.getElementById('view-coupen')
+
 const coupen_divs = document.getElementById('coupen-divs')
 const total_amount = document.getElementById('total-price').getAttribute('data-price')
-console.log("hey")
+
 view_coupen.addEventListener('click', () => {
   fetch('get-coupens', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json' 
     },
     body: JSON.stringify({ total_amount: total_amount })
   })
-  .then(response => response.json())
+  .then(response => {
+    if(res.redirected)
+                {
+                    window.location.href = res.url;
+                }
+    response.json()})
   .then(data => {
     const couponDivs = document.getElementById('coupen-divs');
     couponDivs.style.display = couponDivs.style.display === 'none' ? 'block' : 'none';
@@ -488,12 +512,14 @@ view_coupen.addEventListener('click', () => {
     if (couponDivs.style.display === 'block') {
       couponDivs.innerHTML = data.map(coupon => {
         // Example conditional check based on coupon properties
+        
         let couponContent = '';
-        if (coupon.coupon_type === 'Flat OFF') {
+        if (coupon.coupen_type == "Flat OFF") {
           couponContent = `
             <a href="#" data-coupen-id='${coupon._id}' onclick='selectedCoupen("${coupon._id}","${coupon.coupen_code}")'><div class="coupon">
               <div class="coupon-left">
-                <h2 class="color">${coupon.coupen_offer_amount}</h2>
+                
+                <h2 class="color"> ₹ ${coupon.coupen_offer_amount}</h2>
                 <p>FLAT OFF</p>
               </div>
               <div class="coupon-right">
@@ -537,25 +563,61 @@ view_coupen.addEventListener('click', () => {
 
 
 function selectedCoupen(id,code) {
-
-  
   document.getElementById('coupen-box').value= code
   document.getElementById('coupen-box').setAttribute('data-coupen-id',id)
   document.getElementById('coupen-divs').style.display='none'
+  document.getElementById('remove-coupen').style.display='inline-block'
+
   }
+
+
 function applyCoupen()
 {
     const coupen_code = document.getElementById('coupen-box').value;
+    const coupen_id = document.getElementById('coupen-box').getAttribute('data-coupen-id')
     fetch('/get-single-coupen',{
         method: 'POST',
         headers:{
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({coupen_code: coupen_code})
-    }).then((res)=> res.json())
+    }).then((res)=> {if(res.redirected)
+                {
+                    window.location.href = res.url;
+                }
+                res.json()})
     .then((data)=>{
-        console.log(data)
+        if(data){
+            const discount_div = document.getElementById('discount-div')
+            const discount_span = document.getElementById('discount-span')
+            const total_amount_div = document.getElementById('total-price')
+            const total_amount = total_amount_div.getAttribute('data-price')
+            let newAmount,discount ;
+            if(data.coupen_type ==="Percentage")
+            {
+                discount = (total_amount * (data.coupen_offer_amount/100))
+                newAmount = total_amount- discount
+                
+            }
+            else if(data.coupen_type === 'Flat OFF')
+            {
+                discount = data.coupen_offer_amount
+                newAmount = total_amount- discount
+            }
+            discount_span.innerHTML=discount
+            total_amount_div.innerHTML= newAmount.toFixed(2)
+            
+            
+        }
     }).catch(err=> console.log(err))
 }
+function removeCoupen(amount)
+{
+    document.getElementById('coupen-box').value=""
+    document.getElementById('discount-span').innerHTML = 0
+    document.getElementById('total-price').innerHTML=amount
+    document.getElementById('total-price').setAttribute('data-price',null)
+  document.getElementById('remove-coupen').style.display='none'
 
+}
     </script>

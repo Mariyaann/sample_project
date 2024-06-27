@@ -5,6 +5,7 @@ const clinetCollection = require("../../Schema/clientModel");
 const { addressValidation } = require("../../public/user/validation");
 const orderCollection = require("../../Schema/orderModel");
 const Razorpay = require('razorpay');
+const coupenCollection = require("../../Schema/coupenModel");
 let globalNotification = {};
 const razorpay = new Razorpay({
   key_id: 'rzp_test_1CXfduMW9euDd9',
@@ -221,6 +222,8 @@ const checkoutPage = async (req, res) => {
 
 const razorpayPayment = async (req,res)=>{
   const userId = req.session.user;
+  const  coupenCode = req.body.coupen_code
+  
   const addressData = {
     customer_name: req.body.customer_name,
     customer_emailid: req.body.customer_emailid,
@@ -230,7 +233,7 @@ const razorpayPayment = async (req,res)=>{
     country: req.body.country,
     pincode: Number(req.body.pincode),
     landmark: req.body.landmark,
-    phonenumber: Number(req.body.phonenumber),
+    phonenumber: Number(req.body.phonenumber)
   };
   let addressValid = addressValidation(addressData);
   if (addressValid.status) {
@@ -273,6 +276,20 @@ const razorpayPayment = async (req,res)=>{
       const ShippingCharge = totalSum <= 1000 ? 25 : 0;
       
       let totalPrice = (totalSum + GST + ShippingCharge).toFixed(2);
+      if(coupenCode && coupenCode !=="")
+        {
+          const coupenData = await coupenCollection.findOne({coupen_code:coupenCode});
+          if(coupenData)
+            {
+             if(coupenData.coupen_type == 'Flat OFF'  && totalPrice>=coupenData.coupen_amount_limit) 
+              totalPrice= totalPrice- coupenData.coupen_offer_amount
+            else if(coupenData.coupen_type =='Percentage' && totalPrice>=coupenData.coupen_amount_limit)
+              totalPrice = totalPrice-(totalPrice*(coupenData.coupen_offer_amount/100))
+
+            totalPrice = totalPrice.toFixed(2)
+            }
+        }
+        
       if (totalPrice > 0) {
         
         const amountInPaise = Math.round(totalPrice * 100); // Round to nearest integer
@@ -291,7 +308,7 @@ const razorpayPayment = async (req,res)=>{
                 // Send a detailed error message to the client
                 return res.status(500).json({ message: `Failed to create order: ${err.message}` });
             }
-    
+            
             // If there is no error then send back the order id and total price
             return res.status(200).json({ orderID: order.id, totalPrice: totalPrice });
         });
@@ -454,6 +471,11 @@ const checkOut = async (req, res) => {
     landmark: req.body.landmark,
     phonenumber: Number(req.body.phonenumber),
   };
+  const coupenCode = req.body.coupenCode;
+
+    console.log("coupenCode ======================= ");
+    console.log(coupenCode);
+
 
   const order_id = Math.floor(100000 + Math.random() * 900000);
   const paymentMethod = req.body.pay_method;
@@ -540,12 +562,29 @@ const checkOut = async (req, res) => {
 
         const GST = Math.round((18 / 100) * totalSum * 100) / 100;
         const ShippingCharge = totalSum <= 1000 ? 25 : 0;
-        
-        orderData.totalPrice = (totalSum + GST + ShippingCharge).toFixed(2);
+        let totalPrice = (totalSum + GST + ShippingCharge).toFixed(2);
+        if(coupenCode)
+          {
+            const coupenData = await coupenCollection.findOne({coupen_code: coupenCode})
+            if(coupenData)
+              {
+                if(coupenData.coupen_type === 'Flat OFF' &&  totalPrice>=coupenData.coupen_amount_limit)
+                  {
+                    totalPrice = totalPrice - coupenData.coupen_offer_amount
+                  }else if(coupenData.coupen_type === 'Percentage' &&  totalPrice>=coupenData.coupen_amount_limit)
+                  {
+                    totalPrice = totalPrice -(totalPrice * (coupenData.coupen_offer_amount) ) 
+
+                  }
+                  totalPrice= totalPrice.toFixed(2)
+                orderData.coupen_id = coupenData._id;
+              }
+              
+          }
+        orderData.totalPrice = totalPrice;
         orderData.totalQuantity = totalQuantity;
         orderData.address = addressData;
         orderData.paymentMethod = paymentMethod;
-        
         orderData.orderStatus = 'Pending';
         orderData.order_id = order_id;
 
@@ -600,7 +639,6 @@ const updateCartQantity = async (req,res)=>{
       ]);
       
       
-      console.log("------------------------++++++++++",)
       if(productData.length )
         {
           let product =productData[0].product_data
