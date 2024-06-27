@@ -250,6 +250,7 @@
         </div>
     </form>
         <div class="col-xl-5">
+            
             <div class="card checkout-order-summary">
                 <div class="card-body">
                     
@@ -327,10 +328,12 @@
                                     
                                 <tr class="bg-light">
                                     <td colspan="2">
-                                        <h6 class="font-size-14 m-0">Total:</h6>
+                                        <h6 class="font-size-14 m-0 color">Total:</h6>
                                     </td>
                                     <td>
-                                        ₹ <%= totalSum + ShippingCharge + GST %>
+                                        <span id="total-price " class="color" data-price ="<%= totalSum + ShippingCharge + GST %>"> ₹ <%= totalSum + ShippingCharge + GST %></span>
+                        
+                                        
                                     </td>
                                 </tr>
                             </tbody>
@@ -339,6 +342,23 @@
                     </div>
                 </div>
             </div>
+            <div class="card mb-3 border shadow-0">
+          <div class="card-body">
+            <form>
+      <div class="form-group">
+        <label class="form-label">Have coupon?</label>
+        <div class="input-group">
+          <input type="text" class="form-control border" name="" placeholder="Coupon code" id="coupen-box" />
+          <button class="btn btn-light border" onclick="applyCoupen()">Apply</button>
+        </div>
+        <p class="form-label text-end color" id="view-coupen">View Coupons</p>
+        <div id="coupen-divs" style="display: none;">
+          <!-- Coupons will be inserted here dynamically -->
+        </div>
+      </div>
+    </form>
+          </div>
+        </div>
         </div>
     </div>
     <!-- end row -->
@@ -447,4 +467,95 @@
             document.getElementById('check-out-form').submit();
         }
     })
-</script>
+
+const view_coupen = document.getElementById('view-coupen')
+const coupen_divs = document.getElementById('coupen-divs')
+const total_amount = document.getElementById('total-price').getAttribute('data-price')
+console.log("hey")
+view_coupen.addEventListener('click', () => {
+  fetch('get-coupens', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ total_amount: total_amount })
+  })
+  .then(response => response.json())
+  .then(data => {
+    const couponDivs = document.getElementById('coupen-divs');
+    couponDivs.style.display = couponDivs.style.display === 'none' ? 'block' : 'none';
+
+    if (couponDivs.style.display === 'block') {
+      couponDivs.innerHTML = data.map(coupon => {
+        // Example conditional check based on coupon properties
+        let couponContent = '';
+        if (coupon.coupon_type === 'Flat OFF') {
+          couponContent = `
+            <a href="#" data-coupen-id='${coupon._id}' onclick='selectedCoupen("${coupon._id}","${coupon.coupen_code}")'><div class="coupon">
+              <div class="coupon-left">
+                <h2 class="color">${coupon.coupen_offer_amount}</h2>
+                <p>FLAT OFF</p>
+              </div>
+              <div class="coupon-right">
+                <div class="coupon-code color">
+                  <h5 class="color">${coupon.coupen_code}</h5>
+                  <small>Use the Coupen above orders ${coupon.coupen_amount_limit} </small>
+                </div>
+              </div>
+            </div>
+            </a>
+          `;
+        } else {
+          couponContent = `
+            <a href="#" data-coupen-id='${coupon._id}' onclick='selectedCoupen("${coupon._id}","${coupon.coupen_code}")'><div class="coupon">
+              <div class="coupon-left">coupen
+                <h2 class="color">${coupon.coupen_offer_amount}%</h2>
+                <p>DISCOUNT</p>
+              </div>
+              <div class="coupon-right">
+                <div class="coupon-code ">
+                  <h5 class="color">${coupon.coupen_code}</h5>
+                  <small>Use the Coupen above orders ${coupon.coupen_amount_limit} </small>
+                </div>
+               
+              </div>
+            </div></a>
+          `;
+        }
+        return couponContent;
+      }).join('');
+    } else {
+      couponDivs.innerHTML = '';
+    }
+  })
+  .catch(err => {
+    console.error('Error fetching coupons:', err);
+  });
+});
+
+
+
+
+function selectedCoupen(id,code) {
+
+  
+  document.getElementById('coupen-box').value= code
+  document.getElementById('coupen-box').setAttribute('data-coupen-id',id)
+  document.getElementById('coupen-divs').style.display='none'
+  }
+function applyCoupen()
+{
+    const coupen_code = document.getElementById('coupen-box').value;
+    fetch('/get-single-coupen',{
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({coupen_code: coupen_code})
+    }).then((res)=> res.json())
+    .then((data)=>{
+        console.log(data)
+    }).catch(err=> console.log(err))
+}
+
+    </script>

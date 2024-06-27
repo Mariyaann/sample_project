@@ -87,6 +87,7 @@ router.get('/wishlist-to-cart/:id',userSessionCheck,wishlistController.wishlistT
 // ------------------------------ coupen section ----------------- 
 
 router.post('/get-coupens', userSessionCheck, coupenController.getCoupen)
+router.post('/get-single-coupen',userSessionCheck,coupenController.getSingleCoupen)
 
 
 module.exports = router     

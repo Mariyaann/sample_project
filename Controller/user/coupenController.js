@@ -13,7 +13,27 @@ const getCoupen = async (req, res) => {
     }
   };
   
+// --------------------- Get single coupen details --------------- 
 
+const getSingleCoupen = async (req,res)=>{
+  const coupen_code = req.body.coupen_code || ""
+  if(coupen_code)
+    {
+      try{
+          await checkCoupenStatus();
+          const coupenData = await coupenCollection.findOne({})
+      }
+      catch(err)
+      {
+        res.status(400).json(err)
+      }
+    }
+    else
+    {
+      res.status(400).json()
+    }
+
+}
 
 // ---------------------------- other functions ----------------------- 
 
