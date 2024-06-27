@@ -115,7 +115,7 @@
           <td class="px-4 py-3 text-sm">
     <div class="relative" style="z-index: 100;">
       <a href="#" onclick="toggleDropdown(event, this)"><i class='bx bx-dots-vertical-rounded'></i></a>
-      <div id="dropdownMenu" class="hidden absolute z-10 w-48 py-2 mt-2 origin-top-right bg-white border rounded-md shadow-lg dark:bg-gray-800 dark:border-gray-700">
+      <div id="dropdownMenu" class="hidden absolute z-10 w-48 py-2 mt-2 origin-top-right bg-white border rounded-md shadow-lg dark:bg-gray-800 dark:border-gray-700" style="background-color: #fff; z-index: 10;">
         <a href="/admin/orderDetails/<%= data._id %>" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-400 hover:bg-gray-100 hover:text-gray-900">Details</a>
         <% if(data.orderStatus == 'Pending'){ %>
             <a href="/admin/updateOrderStatus/<%= data._id %>/Confirmed" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-400 hover:bg-gray-100 hover:text-gray-900">Confirm</a>

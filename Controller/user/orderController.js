@@ -1,5 +1,6 @@
 const orderCollection = require('../../Schema/orderModel')
 const productCollection = require('../../Schema/productModel')
+const walletCollection = require('../../Schema/walletModel')
 let globalNotification ={}
 
 
@@ -49,57 +50,77 @@ const viewOrderDetails = async (req,res)=>{
 
 // -------------------- Cancel Entire Order ----------------- 
 
-const cancelOrder= async (req,res)=>{
-    const orderId = req.params.id
-    const customer_id = req.session.user
-    try
-    {
-        const orderData = await orderCollection.findOne({_id:orderId,customer_id:customer_id})
-        if(orderData)
-            {
-                orderData.products.forEach(async (product)=>{
-                   let  product_stock=  product.product_quantity
-                  try
-                  {
-                    const updateStock= await productCollection.findOneAndUpdate({_id: product.product_id},{$inc:{product_stock:product_stock}})
-                    if(updateStock){
-                        await orderCollection.findOneAndUpdate(
-                            { _id: orderId, 'products.product_id': product.product_id },
-                            { $set: { 'products.$.product_status': 'Cancelled' } }
-                        );  
-                        globalNotification={
-                            status:'success',
-                            message: 'Order Canceled Successfully'
-                        }  
-                        res.redirect('/orders')
-                    }
+const cancelOrder = async (req, res) => {
+    const orderId = req.params.id;
+    const customer_id = req.session.user;
 
-                  }catch(err)
-                  {
-                    globalNotification={
-                        status:'error',
+    try {
+        const orderData = await orderCollection.findOne({ _id: orderId, customer_id: customer_id });
+        if (orderData) {
+            for (const product of orderData.products) {
+                try {
+                    await productCollection.findOneAndUpdate(
+                        { _id: product.product_id },
+                        { $inc: { product_stock: product.product_quantity } }
+                    );
+                    await orderCollection.findOneAndUpdate(
+                        { _id: orderId, 'products.product_id': product.product_id },
+                        { $set: { 'products.$.product_status': 'Cancelled' } }
+                    );
+                } catch (err) {
+                    console.log(err);
+                    globalNotification = {
+                        status: 'error',
                         message: 'Something went wrong'
-                    }
-                    console.log(err)
-                  }
-
-                })
-                await orderCollection.findOneAndUpdate({ _id: orderId},{$set:{orderStatus:'Cancelled'}})
-                // await updateOrderStatus(customer_id)
-                
+                    };
+                    res.redirect('/orders');
+                    return;
+                }
             }
-    }catch(err)
-    {
-        globalNotification={
-            status:'error',
-            message: 'Something went wrong'
+
+            await orderCollection.findOneAndUpdate({ _id: orderId }, { $set: { orderStatus: 'Cancelled' } });
+
+            if (['razorpay', 'Wallet'].includes(orderData.paymentMethod)) {
+                const wallet_balance = orderData.totalPrice;
+                const transaction_details = {
+                    wallet_amount: orderData.totalPrice,
+                    order_id: orderData.order_id,
+                    transactionType: 'Credited'
+                };
+
+                const checkWallet = await walletCollection.findOne({ customer_id: customer_id });
+                if (checkWallet) {
+                    await walletCollection.findOneAndUpdate(
+                        { _id: checkWallet._id },
+                        { 
+                            $inc: { wallet_balance: wallet_balance },
+                            $push: { transaction: transaction_details }
+                        }
+                    );
+                } else {
+                    await walletCollection.create({
+                        customer_id: customer_id,
+                        wallet_balance: wallet_balance,
+                        transaction: [transaction_details]
+                    });
+                }
+            }
+
+            globalNotification = {
+                status: 'success',
+                message: 'Order Canceled Successfully'
+            };
+            res.redirect('/orders');
         }
-        console.log(err)
-        res.redirect('/orders')
+    } catch (err) {
+        console.log(err);
+        globalNotification = {
+            status: 'error',
+            message: 'Something went wrong'
+        };
+        res.redirect('/orders');
     }
-    
-    
-}
+};
 
 // -------------------------------------- Other functions ------------------------- 
 
