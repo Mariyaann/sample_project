@@ -42,6 +42,7 @@ app.use((req, res, next) => {
 
 // -------------- re-routing  --------
 app.use("/", userRouter);                             
-app.use("/admin", adminRouter);                     
+app.use("/admin", adminRouter);
+app.use("*",(req,res)=>res.render('./layout/page-not-found'))              
 
 app.listen(port, () => console.log(` server listening on port http://localhost:${port}`));

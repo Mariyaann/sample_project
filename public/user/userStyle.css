@@ -1190,4 +1190,15 @@ a{
   border-radius: 9px;}
   .second-color{
     color: #f8b810 !important;
+
+  }
+  .not-found{
+    background-image: url('../../user/assets/web-img/bg-404.png');
+    background-repeat: repeat;
+    position: relative;
+  }
+  .page-not-btn{
+    position: absolute;
+    display: block;
+    top: 1rem;
   }
