@@ -50,7 +50,6 @@ const updateOrderStatus= async (req,res)=>{
         {
             try
             {
-            
                 const updateStatus = await orderCollection.findOneAndUpdate({ _id : new ObjectId (order_id) },{ $set:{orderStatus:status} }) 
                 if (['razorpay', 'Wallet'].includes(updateStatus.paymentMethod) && status =='Cancelled') {
                     const wallet_balance = updateStatus.totalPrice;

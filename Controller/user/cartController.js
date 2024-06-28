@@ -4,6 +4,7 @@ const productCollection = require("../../Schema/productModel");
 const clinetCollection = require("../../Schema/clientModel");
 const { addressValidation } = require("../../public/user/validation");
 const orderCollection = require("../../Schema/orderModel");
+const walletCollection = require("../../Schema/walletModel");
 const Razorpay = require('razorpay');
 const coupenCollection = require("../../Schema/coupenModel");
 let globalNotification = {};
@@ -198,8 +199,12 @@ const checkoutPage = async (req, res) => {
         },
       },
     ]);
+    let amount_wallet;
+    const walletamount = await walletCollection.findOne({customer_id:user_id},{wallet_balance:1,_id:0})
+    if(!walletamount) amount_wallet=0
+    else amount_wallet = walletamount.wallet_balance.toFixed(2)
     if (productData.length !== 0) {
-      res.render("./user/checkOut", { userData, productData, notification });
+      res.render("./user/checkOut", { userData, productData, notification , walletamount: amount_wallet });
     } else {
       globalNotification = {
         status: "error",
@@ -474,14 +479,10 @@ const checkOut = async (req, res) => {
   };
   const coupenCode = req.body.coupenCode;
 
-    console.log("coupenCode ======================= ");
-    console.log(coupenCode);
-
-
   const order_id = Math.floor(100000 + Math.random() * 900000);
   const paymentMethod = req.body.pay_method;
 
-  if(paymentMethod ==='Cash on delivery'){
+  if(paymentMethod ==='Cash on delivery' || paymentMethod ==='Wallet' ){
       let addressValid = addressValidation(addressData);
       if(!addressValid.status)
         {
@@ -590,7 +591,33 @@ const checkOut = async (req, res) => {
         orderData.paymentMethod = paymentMethod;
         orderData.orderStatus = 'Pending';
         orderData.order_id = order_id;
-
+        if(paymentMethod === 'Wallet'){
+          const walletData = await walletCollection.findOne({customer_id: userId})
+          if(walletData && walletData.wallet_balance>=orderData.totalPrice)
+            {
+              let transaction =
+              {
+                wallet_amount: totalPrice,
+                order_id:order_id,
+                transactionType:'Debited'
+              }
+              const updateWallet = await walletCollection.findOneAndUpdate(
+                { _id: walletData._id, customer_id: userId },
+                {
+                  $inc: { wallet_balance: -totalPrice },
+                  $push: { transaction: transaction }
+                },
+                { returnDocument: 'after' } // Use 'after' to return the updated document
+              );
+            }
+            else{
+              globalNotification = {
+                status: 'error',
+                message: "wallet balance is low. Try another method",
+              };
+              return res.redirect('/checkout');
+            }
+        }
         try {
           const addOrder = await orderCollection.insertMany(orderData);
           if (addOrder) {

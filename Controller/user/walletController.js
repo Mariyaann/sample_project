@@ -4,7 +4,7 @@ const getwallet = async (req,res) => {
         const userId = req.session.user;
         try
         {
-            const walletData= await walletCollection.findOne({customer_id:userId})
+            const walletData= await walletCollection.findOne({customer_id:userId}).sort({'transaction.transaction_date':-1})
             if(!walletData)
             {
                 walletData ={
