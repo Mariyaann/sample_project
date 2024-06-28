@@ -1180,3 +1180,14 @@ a{
 .coupon-button:hover {
   background-color: #d32f2f;
 }
+
+/* ----------- Wallet Style ------------------------  */
+.border{
+  border: 1px solid black;
+}
+
+.transation-row{background: #fefcfc;
+  border-radius: 9px;}
+  .second-color{
+    color: #f8b810 !important;
+  }

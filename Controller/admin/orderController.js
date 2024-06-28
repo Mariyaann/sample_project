@@ -55,7 +55,7 @@ const updateOrderStatus= async (req,res)=>{
                 if (['razorpay', 'Wallet'].includes(updateStatus.paymentMethod) && status =='Cancelled') {
                     const wallet_balance = updateStatus.totalPrice;
                     const transaction_details = {
-                        wallet_amount: updateStatus.totalPrice,
+                        wallet_amount: (updateStatus.totalPrice).toFixed(2),
                         order_id: updateStatus.order_id,
                         transactionType: 'Credited'
                     };

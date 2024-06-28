@@ -8,6 +8,7 @@ const cartController = require('../Controller/user/cartController')
 const orderController = require('../Controller/user/orderController')
 const wishlistController = require('../Controller/user/wishlistController')
 const coupenController = require('../Controller/user/coupenController')
+const walletController= require('../Controller/user/walletController')
 const {userSessionCheck,isUserLogedIn}= require('../Middleware/userMiddleware');
 const cartCollection = require("../Schema/cartModel");
 require('../Service/googleAuth') 
@@ -88,6 +89,11 @@ router.get('/wishlist-to-cart/:id',userSessionCheck,wishlistController.wishlistT
 
 router.post('/get-coupens', userSessionCheck, coupenController.getCoupen)
 router.post('/get-single-coupen',userSessionCheck,coupenController.getSingleCoupen)
+
+// ----------------------------- wallet section --------------------- 
+
+router.get('/wallet',userSessionCheck,walletController.getwallet)
+
 
 
 module.exports = router     

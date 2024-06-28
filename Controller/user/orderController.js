@@ -83,7 +83,7 @@ const cancelOrder = async (req, res) => {
             if (['razorpay', 'Wallet'].includes(orderData.paymentMethod)) {
                 const wallet_balance = orderData.totalPrice;
                 const transaction_details = {
-                    wallet_amount: orderData.totalPrice,
+                    wallet_amount: (orderData.totalPrice).toFixed(2),
                     order_id: orderData.order_id,
                     transactionType: 'Credited'
                 };
