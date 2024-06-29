@@ -113,7 +113,7 @@ const viewProduct = async (req, res) => {
 };
 
 // ------------------------------- View Cart Items ---------------------------- 
-
+//come 
 const viewCart = async (req, res) => {
   const userId = req.session.user;
   let productData = [];
@@ -140,6 +140,9 @@ const viewCart = async (req, res) => {
           },
         },
       ]);
+      
+
+    console.log("productData---------", productData)
 
     }
 
@@ -941,6 +944,29 @@ if (userId) {
     }));
   }
   return productData;
+}
+
+async function productOffer2(productId, categoryId, productPrice) {
+  let offerDetails = {};
+  try {
+      const productOfferCheck = await offerCollection.findOne({ product_id: productId });
+      const categoryOfferCheck = await offerCollection.findOne({ category_id: categoryId });
+      
+      if (productOfferCheck) {
+          offerDetails = {
+              offer_percentage: productOfferCheck.offer_percentage,
+              offer_value: productPrice * (productOfferCheck.offer_percentage / 100),
+          };
+      } else if (categoryOfferCheck) {
+          offerDetails = {
+              offer_percentage: categoryOfferCheck.offer_percentage,
+              offer_amount: productPrice - (productPrice * (categoryOfferCheck.offer_percentage / 100)),
+          };
+      }
+  } catch (err) {
+      console.log(err);
+  }
+  return offerDetails;
 }
 
 

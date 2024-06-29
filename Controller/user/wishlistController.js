@@ -1,5 +1,7 @@
 const wishlistCollection = require('../../Schema/wishlistModel')
 const productCollection = require('../../Schema/productModel');
+const offerCollection = require('../../Schema/offerSchema');
+
 const { ObjectId } = require('mongodb');
 const cartCollection = require('../../Schema/cartModel');
 
@@ -53,29 +55,37 @@ const addWishlist = async (req, res) => {
 //   ------------------------- showing wish list ---------------------------- 
 
 
-const showWishlist = async (req,res)=>{
-
+const showWishlist = async (req, res) => {
     const userId = req.session.user;
-    try{
-        await checkWishlistStatus(userId)
+    try {
+        await checkWishlistStatus(userId);
         const wishlistData = await wishlistCollection.aggregate([
             { $match: { customer_id: new ObjectId(userId) } },
             {
-              $lookup: {
-                from: "products", // Name of the collection to join
-                localField: "product_id", // Field from the input documents
-                foreignField: "_id", // Field from the documents of the "from" collection
-                as: "product_data", // Output array field
-              },
+                $lookup: {
+                    from: "products", // Name of the collection to join
+                    localField: "product_id", // Field from the input documents
+                    foreignField: "_id", // Field from the documents of the "from" collection
+                    as: "product_data", // Output array field
+                },
             },
-          ]);
+        ]);
 
-        res.render('./user/wishlist',{  wishlistData})
+        if (wishlistData.length > 0) {
+            await Promise.all(wishlistData.map(async (data) => {
+                if (data.product_data.length > 0) {
+                    data.product_data[0].offerData = await productOffer(data.product_id, data.product_data[0].category_id, data.product_data[0].product_price);
+                }
+            }));
+
+            console.log(wishlistData[0].product_data);
+        }
+
+        res.render('./user/wishlist', { wishlistData });
+    } catch (err) {
+        console.log(err);
     }
-    catch(err){
-        console.log(err)
-    }
-}
+};
 
 // ---------------------------- Remove items from  wishlist -------------------- 
 
@@ -171,6 +181,29 @@ async function checkWishlistStatus(userId)
                     }
             });
         }
+}
+
+async function productOffer(productId, categoryId, productPrice) {
+    let offerDetails = {};
+    try {
+        const productOfferCheck = await offerCollection.findOne({ product_id: productId });
+        const categoryOfferCheck = await offerCollection.findOne({ category_id: categoryId });
+        
+        if (productOfferCheck) {
+            offerDetails = {
+                offer_percentage: productOfferCheck.offer_percentage,
+                offer_value: productPrice * (productOfferCheck.offer_percentage / 100),
+            };
+        } else if (categoryOfferCheck) {
+            offerDetails = {
+                offer_percentage: categoryOfferCheck.offer_percentage,
+                offer_amount: productPrice - (productPrice * (categoryOfferCheck.offer_percentage / 100)),
+            };
+        }
+    } catch (err) {
+        console.log(err);
+    }
+    return offerDetails;
 }
 
 module.exports ={
