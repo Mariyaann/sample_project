@@ -226,7 +226,7 @@ a {
       color: #2f2f2f;
       text-decoration: none; }
     .product-section .product-item .icon-cross {
-      cursor: alias;
+      cursor:cell;
       position: absolute;
       width: 35px;
       height: 35px;
@@ -1204,4 +1204,10 @@ a{
   }
   .icon-img{
     filter: brightness(0%) !important;
+  }
+  .cross-price{
+    text-decoration: line-through;
+    text-decoration-color: #f9bf29;
+    font-size: 13px;
+    color: gray !important;
   }

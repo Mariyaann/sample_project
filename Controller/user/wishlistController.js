@@ -95,57 +95,63 @@ const removeWishlistItem = async (req,res)=>{
 
 // --------------------------------------- add item from  wishlist to cart ------------------- 
 
-const wishlistToCart = async (req,res)=>{
+const wishlistToCart = async (req, res) => {
     const productId = req.params.id;
     const userId = req.session.user;
-    let responce = {}
-    try{
-        const findProduct = await productCollection.findOne({_id : new ObjectId(productId),product_status: 1, product_status:{$gt:0} })
-        if(findProduct)
-            {
-                const data = {
-                    customer_id: userId,
-                    product_id: productId,
-                    quantity: 1,
-                  };
-                const addtoCart = await cartCollection.insertMany(data);
-                if(addtoCart)
-                {
-                    const removeWishlist = await wishlistCollection.findOneAndDelete({product_id : productId , customer_id: userId})
-                    responce ={ 
-                        status: success,
-                        message : " product added to  cart "
-                    }
-                    res.json(responce)
-                }
-                else
-            {
-                responce={
-                    status:error,
-                    message : 'Not able to add product'
-                }
-                res.json(responce)
-                
-            }
-            }
-            else
-            {
-                responce={
-                    status:error,
-                    message : 'out of stock'
-                }
-                res.json(responce)
-                
-            }
+    let response = {};
+    try {
+        const findProduct = await productCollection.findOne({
+            _id: new ObjectId(productId),
+            product_status: 1
+        });
 
-
-
-    }catch(err){
-        console.log(err)
+        if (findProduct) {
+            const data = {
+                customer_id: userId,
+                product_id: productId,
+                quantity: 1
+            };
+            const checkCart = await cartCollection.findOne({ customer_id: userId, product_id: productId });
+            if (!checkCart) {
+                const addToCart = await cartCollection.insertOne(data);
+                if (addToCart.insertedCount > 0) {
+                    await wishlistCollection.findOneAndDelete({ product_id: productId, customer_id: userId });
+                    response = {
+                        status: "success",
+                        message: "Product added to cart"
+                    };
+                    res.json(response);
+                } else {
+                    response = {
+                        status: "error",
+                        message: "Not able to add product"
+                    };
+                    res.json(response);
+                }
+            } else {
+                response = {
+                    status: "error",
+                    message: "Product already in cart"
+                };
+                res.json(response);
+            }
+        } else {
+            response = {
+                status: "error",
+                message: "Out of stock"
+            };
+            res.json(response);
+        }
+    } catch (err) {
+        console.log(err);
+        response = {
+            status: "error",
+            message: "Internal Server Error"
+        };
+        res.status(500).json(response);
     }
-    
+};
 
-}
 
 async function checkWishlistStatus(userId)
 {

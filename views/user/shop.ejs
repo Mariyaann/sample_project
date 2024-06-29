@@ -81,15 +81,29 @@
                       </div>
                       <div class="flex">
                         <p class="color-primary"><%= data.category_name %></p>
-                        <div><button type="button" name="fav-icon"  class="fav-icon" data-id="<%= data._id %>"><i class='bx bx-heart card-wish-icon'></i></button></div>
+                        <div><button type="button" name="fav-icon"  class="fav-icon" data-id="<%= data._id %>">
+                          <% if(data.isWishlist === true)
+                          {%>
+                            <i class='bx bxs-heart card-wish-icon fav-color'></i>
+                          <%}else{%>
+                            <i class='bx bx-heart card-wish-icon'></i>
+                            <%}%>
+                          </button></div>
                       </div>
                       <h3 class="product-title"><%= data.product_name %></h3>
-                      <h5 class="product-price color-primary">₹<%= data.product_price %></h5>
+                      <%if(data.product_price>data.discounted_price){%>
+                        <h5 class="product-price color-primary">₹<%= data.discounted_price %> <span class="cross-price">₹<%= data.product_price %> </span></h5>
+
+                      <%}else{%>
+                        <h5 class="product-price color-primary">₹<%= data.product_price %></h5>
+                        <%}%>
+                      
                       &nbsp;&nbsp;<%= data.product_quantity %>
                       <h3 class="product-price">Rating: <i class='bx bxs-star rating'></i> 4.5</h3>
-                      <span class="icon-cross">
+                      <span class="icon-cross" id="icon-cross" data-id="<%= data._id %>">
                         <img src="../../user/assets/web-img/cross.svg" class="img-fluid">
                       </span>
+                      
                     </a>
                   </div>
                   <% }); } %>
@@ -211,6 +225,27 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   });
+
+  const cartAddBtn = document.getElementById("icon-cross");
+if (cartAddBtn) {
+    cartAddBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const productId = cartAddBtn.getAttribute('data-id');
+        fetch(`/wishlist-to-cart/${productId}`, {
+            method: "GET"
+        }).then((response) => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                return response.json(); // Correctly parsing JSON response
+            }
+        }).then((data) => {
+            console.log(data, "data");
+        }).catch((err) => {
+            console.log(err);
+        });
+    });
+}
 
 
       </script>

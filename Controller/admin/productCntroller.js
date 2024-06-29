@@ -144,9 +144,9 @@ const updateStatus = async (req, res) => {
             if (changeStatus !== null) {
                 globalNotification['status'] = 'success'
                 if (status == 0)
-                    globalNotification['message'] = "Product enabled successfully"
-                else if (status == 1)
                     globalNotification['message'] = "Product Disabled successfully"
+                else if (status == 1)
+                    globalNotification['message'] = "Product Enabled successfully"
                 else if (status == -1)
                     globalNotification['message'] = "Product Deleted successfully"
             }

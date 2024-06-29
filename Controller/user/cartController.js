@@ -5,8 +5,10 @@ const clinetCollection = require("../../Schema/clientModel");
 const { addressValidation } = require("../../public/user/validation");
 const orderCollection = require("../../Schema/orderModel");
 const walletCollection = require("../../Schema/walletModel");
+const wishlistCollection = require("../../Schema/wishlistModel");
 const Razorpay = require('razorpay');
 const coupenCollection = require("../../Schema/coupenModel");
+const offerCollection=require('../../Schema/offerSchema')
 let globalNotification = {};
 const razorpay = new Razorpay({
   key_id: 'rzp_test_1CXfduMW9euDd9',
@@ -71,7 +73,7 @@ const addToCart = async (req, res) => {
 
 const viewProduct = async (req, res) => {
   const id = req.params.id || "";
-  const userId = req.session.user;
+  const userId = req.session.user || "";
   let notification = {};
   if (globalNotification.status) {
     notification = globalNotification;
@@ -81,15 +83,20 @@ const viewProduct = async (req, res) => {
     try {
       // ------------------- Checking the user is active and product already exitst ------------------
       const cartData = await productExist(id, userId);
-
-      const productData = await productCollection.findOne({
+       
+      let productData = await productCollection.findOne({
         _id: new ObjectId(id),
-      });
+      })
+      productData= [productData]
+      productData = await productOffer(userId,productData)
+      productData = productData[0]
       const allProducts = await productCollection.find({
         category_id: productData.category_id,
         product_status: 1,
         _id: { $ne: new ObjectId(productData._id) },
       });
+
+      
       res.render("./user/singleProduct", {
         productData,
         allProducts,
@@ -877,6 +884,63 @@ async function productExist(productId, userId) {
   }
 
   return responce;
+}
+
+
+async function productOffer(userId="",productData)
+{
+  productData = await Promise.all(productData.map(async (product) => {
+    const productOffers = await offerCollection.find({ product_id: product._id }).sort({ offer_percentage: -1 }).limit(1);
+    const categoryOffers = await offerCollection.find({ category_id: product.category_id }).sort({ offer_percentage: -1 }).limit(1);
+
+    let bestOffer = null;
+    let offerType = '';
+
+    if (productOffers.length > 0 && (!categoryOffers.length || productOffers[0].offer_percentage > categoryOffers[0].offer_percentage)) {
+        bestOffer = productOffers[0];
+        offerType = 'Product';
+    } else if (categoryOffers.length > 0) {
+        bestOffer = categoryOffers[0];
+        offerType = 'Category';
+    }
+
+    // Calculate discounted price if there is an offer
+    if (bestOffer) {
+        const discountedPrice = product.product_price - (product.product_price * (bestOffer.offer_percentage / 100));
+        return {
+            ...product.toObject(), // Convert Mongoose document to plain JavaScript object
+            discounted_price: discountedPrice,
+            offer_percentage: bestOffer.offer_percentage,
+            offer_type: offerType,
+            offer_name: bestOffer.offer_name
+        };
+    } else {
+        return {
+            ...product.toObject(),
+            discounted_price: product.product_price, // No discount
+            offer_percentage: 0,
+            offer_type: '',
+            offer_name: ''
+        };
+    }
+}));
+
+// Check if user is logged in and fetch wishlist
+if (userId) {
+    const customerId = userId;
+
+
+    productData = await Promise.all(productData.map(async (product) => {
+      const wishlist = await wishlistCollection.find({ customer_id: customerId, product_id: product._id });
+      if (wishlist.length>0) {
+        product['isWishlist'] = true;
+      } else {
+        product['isWishlist'] = false;
+      }
+      return product;
+    }));
+  }
+  return productData;
 }
 
 
