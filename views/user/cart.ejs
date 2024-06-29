@@ -79,7 +79,13 @@
                       </button>
                     </div>
                     <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                      <h5 class="mb-0">₹<%= product_data.product_price %></h5>
+                      <%if(product_data.offerData.offer_amount){%>
+                      <h5 class="mb-0 color">₹<%= product_data.offerData.offer_amount %> <span class="cross-price"> ₹<%= product_data.product_price %></span></h5>
+
+                        <%} else {%>
+                      <h5 class="mb-0 color">₹<%= product_data.product_price %></h5>
+
+                        <% } %>
                     </div>
                     <div class="col-md-1 col-lg-1 col-xl-1 text-end">
                       <a href="/remove-cart-item/<%= product._id %>" class="text-danger"><i class="fas fa-trash fa-lg"></i></a>
@@ -104,7 +110,12 @@
             productData.forEach(product => {
               if (product.cart_status === 1) {
                 let singleProduct = product.product_data[0];
-                let productPrice = singleProduct.product_price * product.quantity;
+                if(singleProduct.offerData.offer_amount){
+                  var productPrice = singleProduct.offerData.offer_amount * product.quantity;
+                }else{
+                  var productPrice = singleProduct.product_price * product.quantity;
+                }
+                
                 totalPrice = totalPrice + productPrice;
             %>
             <div class="d-flex justify-content-between">

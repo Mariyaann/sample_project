@@ -270,7 +270,11 @@
                                 productData.forEach(cart => {
                                     const product =cart.product_data[0]
                                     const img = product.product_image[0]
-                                    const productTotal = product.product_price*cart.quantity
+                                    if(product.offerData.offer_amount)
+                                    var productTotal = product.offerData.offer_amount*cart.quantity
+                                    else
+                                    var productTotal = product.product_price*cart.quantity
+
                                     totalSum+=productTotal
                                 %>
                                 <tr>
@@ -284,7 +288,13 @@
                                             <i class="bx bxs-star text-warning"></i>
                                             <i class="bx bxs-star-half text-warning"></i>
                                         </p>
-                                        <p class="text-muted mb-0 mt-1">₹ <%=product.product_price%> x <%=cart.quantity%></p>
+                                        
+                                        
+                                        <p class="text-muted mb-0 mt-1"><% if(product.offerData.offer_amount) {%>
+                                            ₹ <%=product.offerData.offer_amount %>
+                                        <%} else {%>
+                                            ₹ <%=product.product_price%>
+                                        <%}%> x <%=cart.quantity%></p>
                                     </td>
                                     <td>₹ <%= productTotal %></td>
                                 </tr>

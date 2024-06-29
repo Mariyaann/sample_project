@@ -123,7 +123,8 @@ const wishlistToCart = async (req, res) => {
             };
             const checkCart = await cartCollection.findOne({ customer_id: userId, product_id: productId });
             if (!checkCart) {
-                const addToCart = await cartCollection.insertOne(data);
+                const addToCart = await cartCollection.insertMany(data);
+                console.log("addToCart ---------------",addToCart)
                 if (addToCart.insertedCount > 0) {
                     await wishlistCollection.findOneAndDelete({ product_id: productId, customer_id: userId });
                     response = {

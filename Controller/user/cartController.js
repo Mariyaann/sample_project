@@ -113,7 +113,6 @@ const viewProduct = async (req, res) => {
 };
 
 // ------------------------------- View Cart Items ---------------------------- 
-//come 
 const viewCart = async (req, res) => {
   const userId = req.session.user;
   let productData = [];
@@ -141,8 +140,13 @@ const viewCart = async (req, res) => {
         },
       ]);
       
-
-    console.log("productData---------", productData)
+      if (productData.length > 0) {
+        await Promise.all(productData.map(async (data) => {
+            if (data.product_data.length > 0) {
+                data.product_data[0].offerData = await productOffer2(data.product_id, data.product_data[0].category_id, data.product_data[0].product_price);
+            }
+        }));
+    }
 
     }
 
@@ -209,6 +213,12 @@ const checkoutPage = async (req, res) => {
         },
       },
     ]);
+    await Promise.all(productData.map(async (data) => {
+      if (data.product_data.length > 0) {
+          data.product_data[0].offerData = await productOffer2(data.product_id, data.product_data[0].category_id, data.product_data[0].product_price);
+      }
+  }));
+
     let amount_wallet;
     const walletamount = await walletCollection.findOne({customer_id:user_id},{wallet_balance:1,_id:0})
     if(!walletamount) amount_wallet=0
@@ -236,6 +246,7 @@ const checkoutPage = async (req, res) => {
 // -------------------------- razorpay payment ------------------------
 
 const razorpayPayment = async (req,res)=>{
+  
   const userId = req.session.user;
   const  coupenCode = req.body.coupen_code
   
@@ -268,6 +279,14 @@ const razorpayPayment = async (req,res)=>{
         },
       },
     ]);
+    if (productData.length > 0) {
+        await Promise.all(productData.map(async (data) => {
+            if (data.product_data.length > 0) {
+                data.product_data[0].offerData = await productOffer2(data.product_id, data.product_data[0].category_id, data.product_data[0].product_price);
+            }
+        }));
+    }
+    
     if (productData.length !== 0) {
       let totalSum = 0;
       let totalQuantity = 0;
@@ -280,7 +299,7 @@ const razorpayPayment = async (req,res)=>{
 
         let singleProduct = {
           product_quantity: product.quantity,
-          product_price: productDetail.product_price
+          product_price: productDetail.offerData.offer_amount ? productDetail.offerData.offer_amount : productDetail.product_price
         };
 
         totalSum += singleProduct.product_quantity * singleProduct.product_price;
@@ -535,6 +554,13 @@ const checkOut = async (req, res) => {
           },
         },
       ]);
+      if (productData.length > 0) {
+        await Promise.all(productData.map(async (data) => {
+            if (data.product_data.length > 0) {
+                data.product_data[0].offerData = await productOffer2(data.product_id, data.product_data[0].category_id, data.product_data[0].product_price);
+            }
+        }));
+    }
 
       if (productData.length !== 0) {
         let totalSum = 0;
@@ -558,7 +584,7 @@ const checkOut = async (req, res) => {
             product_name: productDetail.product_name,
             product_category: productDetail.category_name,
             product_quantity: product.quantity,
-            product_price: productDetail.product_price,
+            product_price: productDetail.offerData.offer_amount ? productDetail.offerData.offer_amount : productDetail.product_price,
             product_image: productImage,
           };
 
