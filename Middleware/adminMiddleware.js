@@ -2,10 +2,12 @@ const adminSessionCheck = (req,res,next)=>{
     console.log("admin session active");
     if(req.session.adminEmail)
         {
+           
             next();
         }
-        else
-        res.redirect('/admin/')
+        else{
+            res.redirect('/admin/')
+        }
 }
 
 const adminLoginCheck =(req,res,next)=>{

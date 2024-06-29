@@ -1,7 +1,7 @@
 <%- include('./header') %> <%- include('./navbar') %>
 
 
-  <% 
+  <% const coupenCount =0
    if (notification['status']== 'error') { %>
     <script> errorNotification("<%= notification['message'] %>");</script>
   <% }
@@ -27,7 +27,7 @@ let minDate = convertDateString(new Date());
     </div>
     <div>
       <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-        Total Coupens
+        Total Offers
       </p>
       <p class="text-lg font-semibold text-gray-700 dark:text-gray-200"><%= coupenCount %></p>
     </div>
@@ -37,10 +37,10 @@ let minDate = convertDateString(new Date());
 <!-- New Table -->
 
 <div class="mb-4 two-side">
-  <a href="" class="px-4 py-2 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Coupen</a>
+  <a href="" class="px-4 py-2 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Offer</a>
   <div>
-    <form method="get" action="/admin/coupens">
-      <input class="mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" placeholder="Coupen Name" type="text" name="search" />
+    <form method="get" action="/admin/offer">
+      <input class="mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" placeholder="Offer Name" type="text" name="search" />
       <button type="submit" class="px-4 py-2 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
         <i class="bx bx-search"></i>
       </button>
@@ -55,61 +55,57 @@ let minDate = convertDateString(new Date());
           <th class="px-4 py-3 flexble">
              Name
             <div class="sort-div">
-              <a href="/admin/coupens?order=asc&category=coupen_name"><i class="bx bxs-up-arrow"></i></a><a href="/admin/coupens?order=des&category=coupen_name"><i class="bx bxs-down-arrow"></i></a>
+              <a href="/admin/offer?order=asc&category=offer_name"><i class="bx bxs-up-arrow"></i></a><a href="/admin/offer?order=des&category=offer_name"><i class="bx bxs-down-arrow"></i></a>
             </div>
-          </th>
-          <th class="px-4 py-3">
-            <span>Code</span>
-          </th>
-          <th class="px-4 py-3 " >
-            <div style="display: flex; align-items: center;">
-              Created Date
-              <div class="sort-div ">
-              <a href="/admin/coupens?order=asc&category=createdAt"><i class="bx bxs-up-arrow"></i></a><a href="/admin/coupens?order=des&category=createdAt"><i class="bx bxs-down-arrow"></i></a>
-            </div></div></th>
-          
-          
-          <th class="px-4 py-3">
-            <span>Expiry</span>
           </th>
           <th class="px-4 py-3">
             <span>Type</span>
           </th>
+          <th class="px-4 py-3 " >
+            <div style="display: flex; align-items: center;">
+              Category/Product
+              </div></th>
           <th class="px-4 py-3">
-            <span>Amount</span>
+            <span>Expiry</span>
           </th>
           <th class="px-4 py-3">
-            <span>Limit</span>
+            <span>Offer</span>
           </th>
+          <th class="px-4 py-3">
+            <span>Created</span>
+          </th>
+          
           
           <th class="px-4 py-3">Action</th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-        <% if(coupenData.length === 0) { %>
+        <% if(offers.length === 0) { %>
         <tr>
           <td colspan="4">
             <h1 class="text-center">No data fround</h1>
           </td>
         </tr>
-        <% } else { coupenData.forEach((data)=>{ const formatedDate=
-            convertDateString(data.createdAt); const expiryDate = convertDateString(data.coupen_expiry) %>
+        <% } else { offers.forEach((data)=>{ const formatedDate=
+            convertDateString(data.createdAt); const expiryDate = convertDateString(data.offer_expiry) %>
         <tr class="text-gray-700 dark:text-gray-400">
           <td class="px-4 py-3">
             <div class="flex items-center text-sm">
-              <!-- Avatar with inset shadow -->
-
               <div>
-                <p class="font-semibold"><%= data.coupen_name %></p>
+                <p class="font-semibold"><%= data.offer_name %></p>
               </div>
             </div>
           </td>
-          <td class="px-4 py-3 text-sm"><%= data.coupen_code %></td>
-          <td class="px-4 py-3 text-sm"><%= formatedDate %></td>
+          <td class="px-4 py-3 text-sm"><%= data.offer_type %></td>
+          <%if(data.offer_type === 'Category') {%>
+            <td class="px-4 py-3 text-sm"><%= data.category_data[0].category_name%></td>
+        <% } else{ %>
+            <td class="px-4 py-3 text-sm"><%= data.product_data[0].product_name %></td>
+            <%}%>
+          
           <td class="px-4 py-3 text-sm"><%= expiryDate %></td>
-          <td class="px-4 py-3 text-sm"><%= data.coupen_type %></td>
-          <td class="px-4 py-3 text-sm"><%= data.coupen_offer_amount %> <% if(data.coupen_type ==='Flat OFF'){ %> % <%} %></td>
-          <td class="px-4 py-3 text-sm"><%= data.coupen_amount_limit %></td>
+          <td class="px-4 py-3 text-sm"><%= data.offer_percentage %></td>
+          <td class="px-4 py-3 text-sm"><%= formatedDate %></td>
           <td class="px-4 py-3 text-sm">
             <div class="relative">
               <a href="/admin/removeCoupen/<%= data._id %>">
@@ -204,38 +200,43 @@ let minDate = convertDateString(new Date());
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Coupen</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Add Offer</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="coupen-form" action="/admin/add-coupen" method="post">
+        <form id="offer-form" action="/admin/add-offer" method="post">
           <div id="error-message" class="text-red-600 mt-2"></div>
           <label class="block text-sm mt-2">
-            <span class="text-gray-700 dark:text-gray-400">Coupen Name</span>
-            <input id="coupen_name" class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="coupen_name" type="text" required />
+            <span class="text-gray-700 dark:text-gray-400">Offer Name</span>
+            <input id="coupen_name" class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="offer_name" type="text" required />
           </label>
-
           <label class="block text-sm mt-2">
-            <span class="text-gray-700 dark:text-gray-400">Minimum Amount</span>
-            <input id="coupen_amount_limit" class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="coupen_amount_limit" type="number" required />
-          </label>
-
-          <label class="block text-sm mt-2">
-            <span class="text-gray-700 dark:text-gray-400">Coupen Expiry</span>
-            <input class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="coupen_expiry" type="date" min="<%= minDate %>" required />
-          </label>
-
-          <label class="block text-sm mt-2">
-            <span class="text-gray-700 dark:text-gray-400">Coupen Type</span>
-            <select id="coupen_type" class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="coupen_type" required>
-              <option value="Flat OFF">Flat OFF</option>
-              <option value="Percentage">Percentage</option>
+            <span class="text-gray-700 dark:text-gray-400">Offer Type</span>
+            <select id="offer_type" class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="offer_type" required  onchange="getData()"/>
+                <option value="" disabled selected></option>
+                <option value="Product">Product Offer</option>
+                <option value="Category">Category Offer</option>
             </select>
           </label>
 
           <label class="block text-sm mt-2">
-            <span class="text-gray-700 dark:text-gray-400">Offer Amount / Percentage</span>
-            <input id="coupen_offer_amount" class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="coupen_offer_amount" type="number" required />
+            <span class="text-gray-700 dark:text-gray-400">Product / Category</span>
+            <select id="product-category" class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="offer_id"  required />
+                <option value="" selected disabled></option>
+                <option value="ccc" >ccc</option>
+            </select>
+          </label>
+
+          <label class="block text-sm mt-2">
+            <span class="text-gray-700 dark:text-gray-400">Offer Expiry</span>
+            <input class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="offer_expiry" type="date" min="<%= minDate %>" required />
+          </label>
+
+          
+
+          <label class="block text-sm mt-2">
+            <span class="text-gray-700 dark:text-gray-400">Offer Amount ( % )</span>
+            <input id="coupen_offer_amount" class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="offer_percentage" type="number" required />
           </label>
 
           
@@ -258,42 +259,64 @@ let minDate = convertDateString(new Date());
   });
   
   function validation(){
-    const coupen_name = document.getElementsByName('coupen_name')[0].value
-    const coupen_amount_limit = document.getElementsByName('coupen_amount_limit')[0].value
-    const coupen_expiry = document.getElementsByName('coupen_expiry')[0].value
-    const coupen_type = document.getElementsByName('coupen_type')[0].value
-    const coupen_offer_amount = document.getElementsByName('coupen_offer_amount')[0].value
-    let coupenType = document.getElementById('coupen_type').value;
-    let coupenOfferAmount = parseFloat(document.getElementById('coupen_offer_amount').value);
-    let coupenAmountLimit = parseFloat(document.getElementById('coupen_amount_limit').value);
+    const offer_name = document.getElementsByName('offer_name')[0].value
+    const offer_type = document.getElementsByName('offer_type')[0].value
+    const offer_id = document.getElementsByName('offer_id')[0].value
+    const offer_percentage = document.getElementsByName('offer_percentage')[0].value
+    const offer_expiry = document.getElementsByName('offer_expiry')[0].value
+   
     let errorMessage = '';
-    console.log(coupen_name)
-    if(coupen_name == null || coupen_name === undefined || coupen_name === ""){
-    console.log("inside")
-    errorMessage = 'Coupen Name can not be Empty';
-
+    if(offer_name == null || offer_name === undefined || offer_name === ""){
+    errorMessage = 'Offer Name can not be Empty';
     }
-    else if(coupen_amount_limit == null || coupen_amount_limit === undefined || coupen_amount_limit === "")
-    errorMessage = 'Coupen Amount  can not be Empty';
-    else if(coupen_expiry == null || coupen_expiry === undefined || coupen_expiry==="" )
-    errorMessage = 'coupen expiry date can not be Empty';
-    else if(coupen_type == null || coupen_type === undefined || coupen_type === "")
-    errorMessage = 'coupen type  can not be Empty';
-    else if(coupen_offer_amount == null || coupen_offer_amount === undefined || coupen_offer_amount ==="")
-    errorMessage = 'offer amount can not be Empty';
+    else if(offer_type == null || offer_type === undefined || offer_type === "")
+    errorMessage = 'Offer Type  can not be Empty';
+    else if(offer_id == null || offer_id === undefined || offer_id==="" )
+    errorMessage = 'Product  /  Category Can not be Empty';
+    else if(offer_percentage == null || offer_percentage === undefined || offer_percentage ==="" || offer_percentage>=100 || offer_percentage<=0 )
+    errorMessage = 'Offer Amount should be in range between (1% - 99%)';
     
-    else if (coupenType === 'Flat OFF' &&  coupenOfferAmount >= coupenAmountLimit) {
-      errorMessage = 'Offer amount should be less than the minimum amount for Flat OFF type.';
-    } else if (coupenType === 'Percentage' && coupenOfferAmount > 99 ||  coupenOfferAmount<0) {
-      errorMessage = ' Offer amount should be less than 99% for Percentage type.';
-    }
+     
 
     if (errorMessage) {
       document.getElementById('error-message').innerText = errorMessage;
     } else {
-      document.getElementById('coupen-form').submit();
+      document.getElementById('offer-form').submit();
     }
   }
   
- 
+  function getData() {
+    const offer_type = document.getElementById('offer_type').value;
+    if (offer_type) {
+        fetch('/admin/getOfferColumnData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ offer_type: offer_type })
+        }).then((res) => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        }).then((data) => {
+          let options = '';
+if (offer_type === 'Product') {
+  data.forEach(element => {
+    options += `<option value='${element._id}'>${element.product_name}</option>`;
+  });
+} else if (offer_type === 'Category') {
+  data.forEach(element => {
+    options += `<option value='${element._id}'>${element.category_name}</option>`;
+  });
+
+
+}
+document.getElementById('product-category').innerHTML=options
+        }).catch((err) => {
+            console.error('Fetch error:', err);
+        });
+    }
+}
+
   </script>
