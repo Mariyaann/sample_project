@@ -30,7 +30,7 @@ const getOffer = async (req, res) => {
         }
         if(searchStr)
             {
-                search ={customer_name: { $regex: searchStr, $options: "i" }}
+                search ={offer_name: { $regex: searchStr, $options: "i" }}
             }
             
 
@@ -59,7 +59,7 @@ const getOffer = async (req, res) => {
                 $sort: sort
             }
         ]);
-        console.log(offers)
+        
         res.render('./admin/offer', { offers, notification ,convertDateString });
     } catch (err) {
         console.log(err);
@@ -155,6 +155,39 @@ res.redirect('/admin/offer')
 }
 
 
+// ------------------------------------------- Delete offer ------------------------------ 
+
+const removeOffer = async (req,res)=>{
+    const offerId = req.params.id
+    try
+    {
+        const removeOffer = await offerCollection.findOneAndDelete({_id: new ObjectId(offerId)})
+        if(removeOffer)
+            {
+                GlobalNotification ={
+                    status:'success',
+                    message:"Offer Deleted"
+                }
+            }
+            else
+            {
+                GlobalNotification ={
+                    status:'error',
+                    message:"Offer can not find"
+                }
+            }
+    }
+    catch(err)
+    {
+        GlobalNotification ={
+            status:'error',
+            message:"Offer is not Valid "
+        }
+    }
+
+    res.redirect('/admin/offer')
+}
+
 
 
 async function checkOfferStatus(){
@@ -174,5 +207,6 @@ function convertDateString(dateString) {
 module.exports ={
     getOffer,
     getColumnData,
-    addOffer
+    addOffer,
+    removeOffer
 }

@@ -1,7 +1,7 @@
 <%- include('./header') %> <%- include('./navbar') %>
 
 
-  <% const coupenCount =0
+  <% const coupenCount =offers.length
    if (notification['status']== 'error') { %>
     <script> errorNotification("<%= notification['message'] %>");</script>
   <% }
@@ -108,7 +108,7 @@ let minDate = convertDateString(new Date());
           <td class="px-4 py-3 text-sm"><%= formatedDate %></td>
           <td class="px-4 py-3 text-sm">
             <div class="relative">
-              <a href="/admin/removeCoupen/<%= data._id %>">
+              <a href="/admin/removeOffer/<%= data._id %>">
                 <span class="px-2 py-1 font-semibold leading-tight text-orange-700 bg-orange-100 rounded-full dark:text-white dark:bg-orange-600">
                   Delete
                 </span>

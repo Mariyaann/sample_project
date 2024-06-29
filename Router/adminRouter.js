@@ -61,5 +61,6 @@ router.post('/update-coupen/:id',adminSessionCheck,coupenController.updateCoupen
 router.get('/offer',adminSessionCheck, offerController.getOffer)
 router.post('/getOfferColumnData',adminSessionCheck,offerController.getColumnData)
 router.post('/add-offer',adminSessionCheck,offerController.addOffer)
+router.get('/removeOffer/:id',adminSessionCheck,offerController.removeOffer)
 
 module.exports = router
