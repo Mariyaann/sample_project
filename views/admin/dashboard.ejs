@@ -125,7 +125,7 @@
       <h2
         class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200"
       >
-        Charts
+        Report
       </h2>
       <div class="grid gap-6 mb-8 md:grid-cols-2">
         <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
@@ -141,7 +141,7 @@
             Sales by Month
           </h4>
           <canvas id="bars"></canvas>
-          <div id="legend" class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400"></div>
+          <!-- <div id="legend" class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400"></div> -->
         </div>
       </div>
     </div>
@@ -198,8 +198,8 @@
 
         // Prepare the data for the bar chart
         const months = [
-          'January', 'February', 'March', 'April', 'May', 'June',
-          'July', 'August', 'September', 'October', 'November', 'December'
+          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June',
+          'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
         ];
         const salesData = Array(12).fill(0);
         const countData = Array(12).fill(0);
