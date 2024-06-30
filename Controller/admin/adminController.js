@@ -53,6 +53,8 @@ const loadDashBoard = async (req, res) => {
 ])
 const totalSales = await orderCollection.find({orderStatus:{$in:['Confirmed', 'Delivered', 'Shipped','Pending']}}).count()
 const totalPrice = totalAmount.length > 0 ? totalAmount[0].totalPrice : 0;
+
+
   res.render("./admin/dashboard", { userCount, pendingOrder,totalPrice,totalSales });
 };
 

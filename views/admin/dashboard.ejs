@@ -128,62 +128,123 @@
         Charts
       </h2>
       <div class="grid gap-6 mb-8 md:grid-cols-2">
-        <div
-          class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800"
-        >
+        <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
           <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
             Revenue
           </h4>
-          <canvas id="pie"></canvas>
-          <div
-            class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400"
-          >
-            <!-- Chart legend -->
-            <div class="flex items-center">
-              <span
-                class="inline-block w-3 h-3 mr-1 bg-blue-500 rounded-full"
-              ></span>
-              <span>Shirts</span>
-            </div>
-            <div class="flex items-center">
-              <span
-                class="inline-block w-3 h-3 mr-1 bg-teal-600 rounded-full"
-              ></span>
-              <span>Shoes</span>
-            </div>
-            <div class="flex items-center">
-              <span
-                class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"
-              ></span>
-              <span>Bags</span>
-            </div>
-          </div>
+          <canvas id="piee"></canvas>
+          <!-- <div id="legend" class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400"></div> -->
         </div>
-        <div
-          class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800"
-        >
+        
+        <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
           <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
-            Traffic
+            Sales by Month
           </h4>
-          <canvas id="line"></canvas>
-          <div
-            class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400"
-          >
-            <!-- Chart legend -->
-            <div class="flex items-center">
-              <span
-                class="inline-block w-3 h-3 mr-1 bg-teal-600 rounded-full"
-              ></span>
-              <span>Organic</span>
-            </div>
-            <div class="flex items-center">
-              <span
-                class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"
-              ></span>
-              <span>Paid</span>
-            </div>
-          </div>
+          <canvas id="bars"></canvas>
+          <div id="legend" class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400"></div>
         </div>
       </div>
     </div>
   </main>
+
+  <script>
+     async function fetchData() {
+      try {
+        const response = await fetch('/admin/getreport', {
+          method: 'GET'
+        });
+        const data = await response.json();
+        const labels = data.map(item => item._id);
+        const revenue = data.map(item => item.totalRevenue);
+        renderPieChart(labels, revenue);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    function renderPieChart(labels, data) {
+      const ctx = document.getElementById('piee').getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: ['#1E3A8A', '#14B8A6', '#7C3AED','#5fcd6d','red'] 
+          }]
+        }
+      });
+
+      
+      const legendContainer = document.getElementById('legend');
+      legendContainer.innerHTML = ''; 
+      labels.forEach((label, index) => {
+        const color = ['#0e9f6e','#1E3A8A', '#14B8A6', '#7C3AED'][index];
+        const legendItem = document.createElement('div');
+        legendItem.classList.add('flex', 'items-center');
+        legendItem.innerHTML = `<span class="inline-block w-3 h-3 mr-1" style="background-color: ${color}"></span><span>${label}</span>`;
+        legendContainer.appendChild(legendItem);
+      });
+    }
+
+   
+
+    async function fetchSalesData() {
+      try {
+        const response = await fetch('/admin/getsalesbymonth', {
+          method: 'GET'
+        });
+        const data = await response.json();
+
+        // Prepare the data for the bar chart
+        const months = [
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        const salesData = Array(12).fill(0);
+        const countData = Array(12).fill(0);
+
+        data.forEach(item => {
+          salesData[item._id.month - 1] = item.totalSales;
+          countData[item._id.month - 1] = item.count;
+        });
+
+        renderBarChart(months, salesData, countData);
+      } catch (error) {
+        console.error('Error fetching sales data:', error);
+      }
+    }
+
+    function renderBarChart(labels, salesData, countData) {
+      const ctx = document.getElementById('bars').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Sales',
+              data: salesData,
+              backgroundColor: '#1E3A8A' // Customize color as needed
+            },
+            {
+              label: 'Count of Purchases',
+              data: countData,
+              backgroundColor: '#14B8A6' // Customize color as needed
+            }
+          ]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    fetchData();
+    fetchSalesData();
+
+  </script>

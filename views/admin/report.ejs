@@ -1,0 +1,38 @@
+<%- include('./header') %> <%- include('./navbar') %>
+
+<% const salesData = [] %>
+    <script src="../../public/admin/alerts.js"></script>
+
+    <h1>Sales Report</h1>
+    
+<div>
+    <form action="/generate_report" method="POST">
+        <label for="reportType">Select Report Type:</label>
+        <select name="reportType" id="reportType">
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+            <option value="weekly">Weekly</option>
+            <option value="custom">Custom Range</option>
+        </select>
+
+        <div id="customRange" style="display: none;">
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" name="startDate">
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" name="endDate">
+        </div>
+
+        <button type="submit">Generate Report</button>
+    </form>
+</div>
+
+<% if (salesData) { %>
+    <h2>Generated Report</h2>
+    <ul>
+        <% salesData.forEach(function(entry) { %>
+            <li><%= entry.date %> - <%= entry.amount %></li>
+        <% }); %>
+    </ul>
+<% } else { %>
+    <p>No report generated yet.</p>
+<% } %>

@@ -6,6 +6,7 @@ const productController = require('../Controller/admin/productCntroller')
 const orderController = require('../Controller/admin/orderController')
 const coupenController = require('../Controller/admin/coupenController')
 const offerController = require('../Controller/admin/offerController')
+const reportController = require('../Controller/admin/reportController')
 const upload = require('../Middleware/multer');
 const { adminSessionCheck, adminLoginCheck } = require('../Middleware/adminMiddleware')
 
@@ -62,5 +63,16 @@ router.get('/offer',adminSessionCheck, offerController.getOffer)
 router.post('/getOfferColumnData',adminSessionCheck,offerController.getColumnData)
 router.post('/add-offer',adminSessionCheck,offerController.addOffer)
 router.get('/removeOffer/:id',adminSessionCheck,offerController.removeOffer) 
+
+
+// ----------------------- Report section --------------------- 
+
+router.get('/report',adminSessionCheck,reportController.reportPage)
+router.get('/getreport',adminSessionCheck,reportController.getPieChart)
+router.get('/getsalesbymonth', adminSessionCheck, reportController.getSalesByMonth);
+
+
+
+
 
 module.exports = router
