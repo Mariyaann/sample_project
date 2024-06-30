@@ -1,4 +1,4 @@
-<%- include('./header') %>
+<%- include('./header') %> 
 <%- include('./navbar') %>
 <main class="h-full overflow-y-auto">
     <div class="container px-6 mx-auto grid">
@@ -55,12 +55,12 @@
             <p
               class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400"
             >
-              Account balance
+              Total sales
             </p>
             <p
               class="text-lg font-semibold text-gray-700 dark:text-gray-200"
             >
-              $ 46,760.89
+            ₹ <%= totalPrice  %>
             </p>
           </div>
         </div>
@@ -81,12 +81,12 @@
             <p
               class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400"
             >
-              New sales
+              Total sales Count
             </p>
             <p
               class="text-lg font-semibold text-gray-700 dark:text-gray-200"
             >
-              376
+              <%= totalSales %>
             </p>
           </div>
         </div>
@@ -109,12 +109,12 @@
             <p
               class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400"
             >
-              Pending contacts
+              Pending Orders
             </p>
             <p
               class="text-lg font-semibold text-gray-700 dark:text-gray-200"
             >
-              35
+              <%=pendingOrder%>
             </p>
           </div>
         </div>

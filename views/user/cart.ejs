@@ -67,14 +67,16 @@
                     </div>
                     <div class="col-md-3 col-lg-3 col-xl-3">
                       <p class="lead fw-normal mb-2"><%= product_data.product_name %></p>
-                      <p><span class="text-muted"><%= product_data.category_name %></span></p>
+                      <p><span class="text-muted color"><%= product_data.category_name %></span></p>
+                      <span class="text-muted"><i class="fas fa-shopping-basket fa-sm "></i><%= product_data.product_stock%></span>
+              <span class="text-success ms-2">In stock</span>
                     </div>
                     <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
-                      <button class="btn btn-link px-2" onclick="changeInputValue(this, 'decrease', '<%= product._id %>')">
-                        <i class="fas fa-minus"></i>
+                      <button class="btn btn-link px-2" onclick="changeInputValue(this, 'decrease', '<%= product._id %>','<%= product_data.product_stock%>')">
+                        <i class="fas fa-minus"></i> 
                       </button>
                       <input id="stock-input-<%= product._id %>" data-product-id="<%= product._id %>" min="1" max="<%= product_data.product_stock %>" name="quantity" value="<%= product.quantity %>" type="number" class="form-control form-control-sm quantity-bar text-center" style="width:60px;">
-                      <button class="btn btn-link px-2" onclick="changeInputValue(this, 'increase', '<%= product._id %>')">
+                      <button class="btn btn-link px-2" onclick="changeInputValue(this, 'increase', '<%= product._id %>','<%= product_data.product_stock%>')">
                         <i class="fas fa-plus"></i>
                       </button>
                     </div>
@@ -162,18 +164,27 @@
 
 <script>
   // Function to change the input value and dispatch the input event
-function changeInputValue(button, action, productId) {
+function changeInputValue(button, action, productId,stock) {
+ 
     const inputElement = button.parentNode.querySelector(`input[data-product-id='${productId}']`);
-    if (action === 'decrease') {
+    if(inputElement.value == stock  && action =='increase'){
+     notificationMessage("Stock available is "+ stock)
+    }else if(inputElement.value == 1 && action === 'decrease')
+     {
+      notificationMessage("Minimum product quantity should be 1");
+     }
+     else{
+      if (action === 'decrease') {
         inputElement.stepDown();
     } else if (action === 'increase') {
         inputElement.stepUp();
     }
-    // Dispatch the input event
     inputElement.dispatchEvent(new Event('input'));
-    // Call the update function with the new value and product ID
     updateProductQuantity(productId, inputElement.value);
+     }
+    
 }
+
 
 // Function to update the product quantity in the database
 function updateProductQuantity(productId, quantity) {

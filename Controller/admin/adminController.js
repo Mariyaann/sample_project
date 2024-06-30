@@ -1,5 +1,6 @@
 const validation = require("../../public/admin/validations");
 const clientCollection = require("../../Schema/clientModel");
+const orderCollection = require("../../Schema/orderModel");
 const dbConnection = require("../../Config/dbConnect");
 const { ObjectId } = require("mongodb");
 const productModel = require("../../Schema/productModel");
@@ -45,7 +46,14 @@ const adminLogin = (req, res) => {
 
 const loadDashBoard = async (req, res) => {
   const userCount = await getUserCount();
-  res.render("./admin/dashboard", { userCount });
+  const pendingOrder = await orderCollection.find({orderStatus:"Pending"}).count();
+  const totalAmount = await orderCollection.aggregate([
+    { $match: { orderStatus: { $in: ['Confirmed', 'Delivered', 'Shipped'] } } },
+    { $group: { _id: null, totalPrice: { $sum: "$totalPrice" } } }
+])
+const totalSales = await orderCollection.find({orderStatus:{$in:['Confirmed', 'Delivered', 'Shipped','Pending']}}).count()
+const totalPrice = totalAmount.length > 0 ? totalAmount[0].totalPrice : 0;
+  res.render("./admin/dashboard", { userCount, pendingOrder,totalPrice,totalSales });
 };
 
 // ------------------------------------------------- User List Loading -------------------- 

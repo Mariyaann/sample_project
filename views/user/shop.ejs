@@ -48,16 +48,25 @@
 
             <div class="col-9">
               <div class="container">
-                <div class="sort-box-div mb-3">
-                  <select name="sort-box" class="sort-box" onchange="sortbyCategory('<%= category %>')">
-                    <option disabled selected>Sort By</option>
-                    <option value="1">Price low - high</option>
-                    <option value="2">Price high - low</option>
-                    <option value="3">New arrival</option>
-                    <option value="4">Product Name Aa - Zz</option>
-                    <option value="5">Product Name Zz - Aa</option>
-                  </select>
+                <div class="flex">
+                  <% if(category) {%>
+                    <h6><a href="/">Home</a> / <a href="/shop">Shop</a>  / <span class="color"><%= productData[0].category_name  %></span></h6>
+                    <% } else { %>
+                      <p><a href="/">Home</a> / <a href="/shop">Shop</a> / <span class="color">All Product</span></p>
+                    <%  } %>
+                  
+                  <div class="sort-box-div mb-3">
+                    <select name="sort-box" class="sort-box" onchange="sortbyCategory('<%= category %>')">
+                      <option disabled selected>Sort By</option>
+                      <option value="1">Price low - high</option>
+                      <option value="2">Price high - low</option>
+                      <option value="3">New arrival</option>
+                      <option value="4">Product Name Aa - Zz</option>
+                      <option value="5">Product Name Zz - Aa</option>
+                    </select>
+                  </div>
                 </div>
+                
                 <div class="row">
                   <% if(productData.length === 0) { %>
                     <h5 class="text-center mt-5">No Product Available</h5>
@@ -226,11 +235,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  const cartAddBtn = document.getElementById("icon-cross");
-if (cartAddBtn) {
-    cartAddBtn.addEventListener('click', (e) => {
+  document.querySelectorAll(".icon-cross").forEach(button => {
+    button.addEventListener('click', (e) => {
         e.preventDefault();
-        const productId = cartAddBtn.getAttribute('data-id');
+        const productId = button.getAttribute('data-id');
+        console.log("icon-cross",productId);
+
         fetch(`/wishlist-to-cart/${productId}`, {
             method: "GET"
         }).then((response) => {
@@ -240,17 +250,23 @@ if (cartAddBtn) {
                 return response.json(); // Correctly parsing JSON response
             }
         }).then((data) => {
+          Swal.fire({
+    position: "top-end",
+    text: data.message,
+    showConfirmButton: false,
+    timer: 2500
+  });
             console.log(data, "data");
         }).catch((err) => {
             console.log(err);
         });
     });
-}
+});
 
 
       </script>
 
-      <% -include('../layout/footer') %>
+      <%- include('../layout/footer') %>
         </body>
 
         </html>

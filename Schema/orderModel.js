@@ -50,11 +50,6 @@ const schema = new mongoose.Schema({
         phonenumber:Number,
         landMark:String
     },
-    // couponDiscount:{
-    //     type:mongoose.Schema.Types.ObjectId,
-    //     ref:'coupon',
-    //     default:null
-    // },
     paymentMethod: {
         type: String,
         required: true,
