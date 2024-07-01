@@ -127,6 +127,33 @@
                     </div>
                 </div>
             </div>
+            <% const address =productData.address %>
+            <div class=" mt-lg-3 mt-3"><div class="card border shadow-none">
+                    <div class="card-header bg-transparent border-bottom py-3 px-4">
+                        <h6 class="font-size-16 mb-0">Shipping Address</h6>
+                    </div>
+                    <div class="single-address-div p-4">
+                          
+                          <div class="address">
+                            <p><span>
+                                <h4 class="d-inline-block"><i class='bx bx-home'></i></h4> <%=address.building %>,
+                              </span>
+                              <span>
+                                <%=address.street %>
+                              </span>
+                              <span>
+                                <%=address.city %> ,
+                              
+                             <%=address.country %> ,<%=address.pincode %>,<%=address.phonenumber
+                                      %>
+                                    </span>
+                            <span>
+                              <%=address.landmark %>
+                            </span></p>
+                          </div>
+                        </div>
+                    </div>
+        </div>
         </div>
     </div>
     <!-- end row -->
