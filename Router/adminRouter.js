@@ -70,6 +70,9 @@ router.get('/removeOffer/:id',adminSessionCheck,offerController.removeOffer)
 router.get('/report',adminSessionCheck,reportController.reportPage)
 router.get('/getreport',adminSessionCheck,reportController.getPieChart)
 router.get('/getsalesbymonth', adminSessionCheck, reportController.getSalesByMonth);
+router.post('/fetch-sales-data', adminSessionCheck, reportController.getOrderDetails);
+
+
 
 
 
