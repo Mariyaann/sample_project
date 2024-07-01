@@ -42,6 +42,7 @@ const addToCart = async (req, res) => {
 
     const checkProduct = await productExist(data.product_id, data.customer_id);
 
+    const checkWishList = await wishlistCollection.findOneAndDelete({product_id : data.product_id })
     if (checkProduct) {
       const newQuantity = data.quantity + checkProduct.quantity;
 

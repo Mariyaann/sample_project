@@ -1,5 +1,6 @@
 <%- include('./header') %> 
 <%- include('./navbar') %>
+
 <main class="h-full overflow-y-auto">
     <div class="container px-6 mx-auto grid">
     
@@ -71,7 +72,7 @@
 <!-- ------------------------------------------------------------------------------------------------------------ -->
 <div class="w-full overflow-hidden rounded-lg shadow-xs">
   
-    <form action="/generate_report" method="POST" class="flex text-end justify-content-end m-4">
+    <form  class="flex text-end justify-content-end m-4">
             
         <div id="sales customRange"  class="mr-3">
             <input type="date" id="startDate" name="startDate"  placeholder="Start Date" class="border p-1">
@@ -87,8 +88,8 @@
         </select>
 
         
+        <button type="button" onclick="downloadReport()" class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">Download Report</button>
 
-        <button type="submit" class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">Download Report</button>
     </form>
     <div class="w-full overflow-x-auto">
     <table class="w-full whitespace-no-wrap">
@@ -115,7 +116,7 @@
           <th class="px-4 py-3 flexble">
             <span>Time</span>
           </th>
-          <th class="px-4 py-3">STatus</th>
+          <th class="px-4 py-3">Status</th>
           
         </tr>
       </thead>
@@ -238,6 +239,10 @@
       </div>
     </div>
   </main>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <script>
      async function fetchData() {
@@ -457,6 +462,26 @@ function getStatusBadge(status) {
             return status;
     }
 }
+
+
+function downloadReport() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      html2canvas(document.querySelector(".w-full")).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgProps = doc.getImageProperties(imgData);
+        const pdfWidth = doc.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        doc.save('sales_report.pdf');
+      });
+    }
+
+
+
+
 
     fetchData();
     fetchSalesData();
