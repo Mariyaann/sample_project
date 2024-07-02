@@ -5,14 +5,13 @@ const dbConnection = require("../../Config/dbConnect");
 const { ObjectId } = require("mongodb");
 const productModel = require("../../Schema/productModel");
 
-
-// --------------------------------------- Login Page Loading ------------------- 
+// --------------------------------------- Login Page Loading -------------------
 
 const loadAdminLogin = (req, res) => {
   res.render("./admin/login", { error: null, message: "", formValues: {} });
 };
 
-// --------------------------------------- Admin Login ------------------------- 
+// --------------------------------------- Admin Login -------------------------
 
 const adminLogin = (req, res) => {
   const adminEmail = process.env.ADMIN_EMAIL;
@@ -42,23 +41,33 @@ const adminLogin = (req, res) => {
   }
 };
 
-// ------------------------------------------------ Dashboard loading ---------------------- 
+// ------------------------------------------------ Dashboard loading ----------------------
 
 const loadDashBoard = async (req, res) => {
   const userCount = await getUserCount();
-  const pendingOrder = await orderCollection.find({orderStatus:"Pending"}).count();
+  const pendingOrder = await orderCollection
+    .find({ orderStatus: "Pending" })
+    .count();
   const totalAmount = await orderCollection.aggregate([
-    { $match: { orderStatus: { $in: ['Confirmed', 'Delivered', 'Shipped'] } } },
-    { $group: { _id: null, totalPrice: { $sum: "$totalPrice" } } }
-])
-const totalSales = await orderCollection.find({orderStatus:{$in:['Confirmed', 'Delivered', 'Shipped','Pending']}}).count()
-const totalPrice = totalAmount.length > 0 ? totalAmount[0].totalPrice : 0;
+    { $match: { orderStatus: { $in: ["Confirmed", "Delivered", "Shipped"] } } },
+    { $group: { _id: null, totalPrice: { $sum: "$totalPrice" } } },
+  ]);
+  const totalSales = await orderCollection
+    .find({
+      orderStatus: { $in: ["Confirmed", "Delivered", "Shipped", "Pending"] },
+    })
+    .count();
+  const totalPrice = totalAmount.length > 0 ? totalAmount[0].totalPrice : 0;
 
-
-  res.render("./admin/dashboard", { userCount, pendingOrder,totalPrice,totalSales });
+  res.render("./admin/dashboard", {
+    userCount,
+    pendingOrder,
+    totalPrice,
+    totalSales,
+  });
 };
 
-// ------------------------------------------------- User List Loading -------------------- 
+// ------------------------------------------------- User List Loading --------------------
 
 const clientsListLoad = async (req, res) => {
   const search = req.query.search || "";
@@ -108,7 +117,7 @@ const clientsListLoad = async (req, res) => {
   }
 };
 
-// -------------------------------------------------user Enable Disable Delete ------------------ 
+// -------------------------------------------------user Enable Disable Delete ------------------
 
 const updateClientStatus = async (req, res) => {
   const status = Number(req.params.status);
@@ -131,14 +140,14 @@ const updateClientStatus = async (req, res) => {
   res.redirect(`/admin/clients`);
 };
 
-// --------------------------------------------------- Admin Logout --------------------------- 
+// --------------------------------------------------- Admin Logout ---------------------------
 
 const logout = (req, res) => {
   req.session.destroy();
   res.redirect("/admin");
 };
 
-// ---------------------------------------------------- Format Timestamp -------------------- 
+// ---------------------------------------------------- Format Timestamp --------------------
 function dateFormat(inputDate) {
   const formated = new Date(inputDate);
 
@@ -147,7 +156,7 @@ function dateFormat(inputDate) {
   return formattedDate;
 }
 
-// ----------------------------------------------------- Get count of total active users --------------------- 
+// ----------------------------------------------------- Get count of total active users ---------------------
 async function getUserCount() {
   return await clientCollection.find({ customer_status: { $ne: -1 } }).count();
 }

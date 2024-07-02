@@ -2,7 +2,7 @@ const offerCollection = require('../../Schema/offerSchema')
 const productCollection = require('../../Schema/productModel')
 const categoryCollection = require('../../Schema/categoryModel');
 const { ObjectId } = require('mongodb');
-let GlobalNotification ={}
+let GlobalNotification = {}
 
 const getOffer = async (req, res) => {
     const category = req.query.category || ""
@@ -13,54 +13,50 @@ const getOffer = async (req, res) => {
         notification = GlobalNotification;
         GlobalNotification = {};
     }
-    let search={}, sort ={};
-    if(category && order)
-        {
-            if(order ==='asc')
-                {
-                    sort ={ category : 1}
-                }
-                else
-                sort ={ category : -1}
-
+    let search = {}, sort = {};
+    if (category && order) {
+        if (order === 'asc') {
+            sort = { category: 1 }
         }
         else
-        {
-            sort ={ createdAt : -1}
-        }
-        if(searchStr)
-            {
-                search ={offer_name: { $regex: searchStr, $options: "i" }}
-            }
-            
+            sort = { category: -1 }
+
+    }
+    else {
+        sort = { createdAt: -1 }
+    }
+    if (searchStr) {
+        search = { offer_name: { $regex: searchStr, $options: "i" } }
+    }
+
 
     await checkOfferStatus();
 
     try {
-        const offers = await offerCollection.aggregate([{$match: search},
-            {
-                
-                $lookup: {
-                    from: 'categories',
-                    localField: 'category_id', // Use the correct field name
-                    foreignField: '_id',
-                    as: 'category_data'
-                }
-            },
-            {
-                $lookup: {
-                    from: 'products',
-                    localField: 'product_id',
-                    foreignField: '_id',
-                    as: 'product_data'
-                }
-            },
-            {
-                $sort: sort
+        const offers = await offerCollection.aggregate([{ $match: search },
+        {
+
+            $lookup: {
+                from: 'categories',
+                localField: 'category_id', // Use the correct field name
+                foreignField: '_id',
+                as: 'category_data'
             }
+        },
+        {
+            $lookup: {
+                from: 'products',
+                localField: 'product_id',
+                foreignField: '_id',
+                as: 'product_data'
+            }
+        },
+        {
+            $sort: sort
+        }
         ]);
-        
-        res.render('./admin/offer', { offers, notification ,convertDateString });
+
+        res.render('./admin/offer', { offers, notification, convertDateString });
     } catch (err) {
         console.log(err);
         res.status(500).json({ 'Message': "Internal Server Error" });
@@ -97,91 +93,83 @@ const getColumnData = async (req, res) => {
 
 // --------------------------------- Add New Offer ----------------------- 
 
-const addOffer = async (req,res)=>{
-    const data ={
-        offer_name : req.body.offer_name,
-        offer_type : req.body.offer_type,
-        offer_expiry : req.body.offer_expiry,
-        offer_percentage : req.body.offer_percentage
+const addOffer = async (req, res) => {
+    const data = {
+        offer_name: req.body.offer_name,
+        offer_type: req.body.offer_type,
+        offer_expiry: req.body.offer_expiry,
+        offer_percentage: req.body.offer_percentage
     }
     let exist;
-    if(data.offer_type ==='Product'){
-        data['product_id']= req.body.offer_id
-        exist = await offerCollection.findOne({product_id:data.product_id})
+    if (data.offer_type === 'Product') {
+        data['product_id'] = req.body.offer_id
+        exist = await offerCollection.findOne({ product_id: data.product_id })
     }
-    else if(data.offer_type === 'Category'){
-        data['category_id']=req.body.offer_id
-        exist = await offerCollection.findOne({category_id:data.category_id})
+    else if (data.offer_type === 'Category') {
+        data['category_id'] = req.body.offer_id
+        exist = await offerCollection.findOne({ category_id: data.category_id })
     }
 
-    try
-    {
-        const existsName = await offerCollection.findOne({offer_name:data.offer_name});
-        if(existsName)
-            {
-                GlobalNotification={
-                    status:'error',
-                    message:'Offer Name Already exists'
+    try {
+        const existsName = await offerCollection.findOne({ offer_name: data.offer_name });
+        if (existsName) {
+            GlobalNotification = {
+                status: 'error',
+                message: 'Offer Name Already exists'
+            }
+        }
+        else if (exist) {
+            GlobalNotification = {
+                status: 'error',
+                message: 'Already an offer available for this Category / Product'
+            }
+        }
+        else {
+            const addOffer = await offerCollection.insertMany(data)
+            if (addOffer) {
+                GlobalNotification = {
+                    status: 'success',
+                    message: 'Offer Added Successfully'
                 }
             }
-            else if(exist)
-                {
-                    GlobalNotification={
-                        status:'error',
-                        message:'Already an offer available for this Category / Product'
-                    }
-                }
-                else
-                {
-                    const addOffer = await offerCollection.insertMany(data)
-                    if(addOffer){
-                        GlobalNotification={
-                            status:'success',
-                            message:'Offer Added Successfully'
-                        }
-                    }
-                    
-                }
 
-        
-    }catch(err){
-        GlobalNotification={
-            status:'error',
-            message:'Something went wrong'
+        }
+
+
+    } catch (err) {
+        GlobalNotification = {
+            status: 'error',
+            message: 'Something went wrong'
         }
         console.log(err)
     }
-res.redirect('/admin/offer')
+    res.redirect('/admin/offer')
 }
 
 
 // ------------------------------------------- Delete offer ------------------------------ 
 
-const removeOffer = async (req,res)=>{
+const removeOffer = async (req, res) => {
     const offerId = req.params.id
-    try
-    {
-        const removeOffer = await offerCollection.findOneAndDelete({_id: new ObjectId(offerId)})
-        if(removeOffer)
-            {
-                GlobalNotification ={
-                    status:'success',
-                    message:"Offer Deleted"
-                }
+    try {
+        const removeOffer = await offerCollection.findOneAndDelete({ _id: new ObjectId(offerId) })
+        if (removeOffer) {
+            GlobalNotification = {
+                status: 'success',
+                message: "Offer Deleted"
             }
-            else
-            {
-                GlobalNotification ={
-                    status:'error',
-                    message:"Offer can not find"
-                }
+        }
+        else {
+            GlobalNotification = {
+                status: 'error',
+                message: "Offer can not find"
             }
+        }
     }
-    catch(err)
-    {
-        GlobalNotification ={
-            status:'error',
-            message:"Offer is not Valid "
+    catch (err) {
+        GlobalNotification = {  
+            status: 'error',
+            message: "Offer is not Valid "
         }
     }
 
@@ -190,10 +178,10 @@ const removeOffer = async (req,res)=>{
 
 
 
-async function checkOfferStatus(){
+async function checkOfferStatus() {
     const currentDate = new Date();
-     const result = await offerCollection.deleteMany(
-        { offer_expiry: { $lt: currentDate } }        
+    const result = await offerCollection.deleteMany(
+        { offer_expiry: { $lt: currentDate } }
     );
 }
 function convertDateString(dateString) {
@@ -204,7 +192,7 @@ function convertDateString(dateString) {
     return `${year}-${month}-${day}`;
 }
 
-module.exports ={
+module.exports = {
     getOffer,
     getColumnData,
     addOffer,
