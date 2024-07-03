@@ -79,7 +79,7 @@
             
             <input type="date" id="endDate" name="endDate"  placeholder="End Date" class="border p-1">
         </div>
-        <select name="salesreportType" id="salesreportType" onchange="getOrderData()">
+        <select name="salesreportType" id="salesreportType" onchange="getOrderData()" class="mr-5">
             <option value="">Full Report</option>
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
@@ -364,9 +364,47 @@
     })
 
     async function getOrderData() {
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
+      let startDate,endDate;
+     
     const salesreportType = document.getElementById('salesreportType').value;
+    console.log("startDate",startDate);
+    console.log("endDate",endDate);
+    console.log("salesreportType",salesreportType);
+    switch(salesreportType)
+    {
+      case 'custom':
+        console
+        startDate = document.getElementById('startDate').value;
+        endDate = document.getElementById('endDate').value;
+        if(!startDate || !endDate){
+          salesreportType=""
+        }
+        break;
+      
+      
+      case 'monthly':
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date.now()
+        break;
+      
+      case 'yearly' : 
+        endDate = new Date.now();
+        startDate = new Date(now.getFullYear(), 0, 1);
+        break;
+      
+      case 'weekly' : 
+        endDate = new Date.now();
+        startDate = currentDate.getDate() - currentDate.getDay();
+        break;
+      
+      case 'daily': 
+        endDate = new Date.now();
+        startDate = (currentDate.getDate() - currentDate.getDay()).setHours(0, 0, 0, 0);
+      
+    }
+    console.log("startDate",startDate);
+    console.log("endDate",endDate);
+    console.log("salesreportType",salesreportType);
 
     try {
         const response = await fetch('/admin/fetch-sales-data', {

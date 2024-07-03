@@ -7,6 +7,7 @@ const orderController = require('../Controller/admin/orderController')
 const coupenController = require('../Controller/admin/coupenController')
 const offerController = require('../Controller/admin/offerController')
 const reportController = require('../Controller/admin/reportController')
+const popularController = require('../Controller/admin/popularController')
 const upload = require('../Middleware/multer');
 const { adminSessionCheck, adminLoginCheck } = require('../Middleware/adminMiddleware')
 
@@ -72,6 +73,12 @@ router.get('/getreport',adminSessionCheck,reportController.getPieChart)
 router.get('/getsalesbymonth', adminSessionCheck, reportController.getSalesByMonth);
 router.post('/fetch-sales-data', adminSessionCheck, reportController.getOrderDetails);
 
+
+// ------------------------ Popular section ------------------------------------- 
+
+router.get('/popular',adminSessionCheck,popularController.popularPage)
+router.get('/popularProducts',adminSessionCheck,popularController.popularProducts)
+router.get('/popularCategory',adminSessionCheck,popularController.popularCategory)
 
 
 
