@@ -94,6 +94,11 @@ router.post('/get-single-coupen',userSessionCheck,coupenController.getSingleCoup
 
 router.get('/wallet',userSessionCheck,walletController.getwallet)
 
+// ------------------------------ Invoice section ------------------------------- 
+
+router.get('/download-invoice/:id',userSessionCheck,orderController.downloadInvoice)
+
+
 
 
 module.exports = router     

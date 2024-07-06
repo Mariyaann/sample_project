@@ -57,7 +57,7 @@ const loadDashBoard = async (req, res) => {
       orderStatus: { $in: ["Confirmed", "Delivered", "Shipped", "Pending"] },
     })
     .count();
-  const totalPrice = totalAmount.length > 0 ? totalAmount[0].totalPrice : 0;
+  const totalPrice = totalAmount.length > 0 ? (totalAmount[0].totalPrice).toFixed(2) : 0;
 
   res.render("./admin/dashboard", {
     userCount,

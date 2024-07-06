@@ -72,6 +72,7 @@ router.get('/report',adminSessionCheck,reportController.reportPage)
 router.get('/getreport',adminSessionCheck,reportController.getPieChart)
 router.get('/getsalesbymonth', adminSessionCheck, reportController.getSalesByMonth);
 router.post('/fetch-sales-data', adminSessionCheck, reportController.getOrderDetails);
+router.post('/downloadPDF',adminSessionCheck,reportController.downloadPDF)
 
 
 // ------------------------ Popular section ------------------------------------- 

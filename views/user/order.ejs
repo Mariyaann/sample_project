@@ -77,13 +77,18 @@
                     <%=order.paymentMethod %></span></p>
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-4 d-flex gap-5 align-items-center">
                 <div class="mt-3">
                     <% if(order.orderStatus!=='Delivered' && order.orderStatus!=='Returned' && order.orderStatus!=='Cancelled'){ %>
                   <a href="#" class="btn" onclick="cancelOrder('<%= order._id%>')">Cancel Order</a>
                   <% } else if(order.orderStatus==='Delivered'){%>
                     <a href="/return-order/<%= order._id%>" class="btn">Return Order</a>
                     <% } %>
+                </div>
+                <div class="mt-3">
+                  <% if(order.orderStatus!=='Cancelled' && order.orderStatus!=='Returned') {%>
+                    <a  onclick="downloadInvoice('<%= order._id%>')" class="color h6" style="cursor: pointer;" ><i class='bx bx-download'></i> Invoice</a>
+                  <% } %>
                 </div>
               </div>
             </div>
@@ -138,4 +143,26 @@
       }
     });
   }
-</script>
+  async function downloadInvoice(orderId) {
+    try {
+        const response = await fetch(`/download-invoice/${orderId}`, {
+            method: 'GET'
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `Invoice_${orderId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error downloading report:', error);
+    }
+}</script>
