@@ -1211,3 +1211,10 @@ a{
     font-size: 13px;
     color: gray !important;
   }
+  .border-round {
+    border-radius: 25px;
+    
+  }
+  .border-round:hover{
+    background-color: #eeeeee;
+  }

@@ -495,6 +495,8 @@ const razorpayOrder = async (req,res)=>{
 // ------------------------ Product Checkout ----------------------------- 
 
 const checkOut = async (req, res) => {
+  const razorPaymentStatus = req.body.paymentStatus
+  console.log(razorPaymentStatus)
   const userId = req.session.user;
   const addressData = {
     customer_name: req.body.customer_name,
@@ -626,6 +628,9 @@ const checkOut = async (req, res) => {
         orderData.totalQuantity = totalQuantity;
         orderData.address = addressData;
         orderData.paymentMethod = paymentMethod;
+        if(paymentMethod ==='razorpay' && razorPaymentStatus === 'failed')
+        orderData.orderStatus = 'Payment Pending';
+        else
         orderData.orderStatus = 'Pending';
         orderData.order_id = order_id;
         if(paymentMethod === 'Wallet'){
@@ -652,6 +657,7 @@ const checkOut = async (req, res) => {
                 status: 'error',
                 message: "wallet balance is low. Try another method",
               };
+              
               return res.redirect('/checkout');
             }
         }
@@ -662,6 +668,11 @@ const checkOut = async (req, res) => {
               await cartCollection.findOneAndDelete({ _id: cartItem._id });
             }
           }
+          if(razorPaymentStatus === 'failed')
+            {
+              res.render('./user/order-failed');
+            }
+            else
             res.render('./user/order-success');
           
         } catch (err) {

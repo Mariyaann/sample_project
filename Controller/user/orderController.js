@@ -18,15 +18,38 @@ const viewOrders= async (req,res)=>{
     try{
         // const updateOrder = await updateOrderStatus(user_id)
         
-        const orderData = await orderCollection.find({customer_id:user_id}).sort({createdAt:-1})
+        const orderData = await orderCollection.find({customer_id:user_id,orderStatus:{$in:['Pending','Confirmed','Shipped']}}).sort({createdAt:-1})
+        const pendingOrders = await orderCollection.find({customer_id:user_id,orderStatus:'Payment Pending'}).sort({createdAt:-1})
         
-        res.render('./user/order',{orderData,notification})
+        res.render('./user/order',{orderData,notification,pendingOrders})
         
     }
     catch(err)
     {
         console.log(err); 
     }
+
+}
+
+// ------------------------------------- Get Order By Category ------------------- 
+
+const orderByStatus= async(req,res)=>{
+    const status = req.body.orderStatus;
+    const user_id = req.session.user;
+    if(status)
+    {
+        try{
+        const orderData = await orderCollection.find({customer_id:user_id,orderStatus:status}).sort({createdAt:-1})
+        res.json(orderData)
+
+        }
+        catch(err)
+        {
+            res.status(400).json({messsage: err})
+        }
+    }
+    else
+        res.status(400).json({messsage: 'order status is null'})
 
 }
 
@@ -266,5 +289,6 @@ module.exports ={
 viewOrders,
 viewOrderDetails,
 cancelOrder,
-downloadInvoice
+downloadInvoice,
+orderByStatus
 }

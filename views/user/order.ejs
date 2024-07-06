@@ -13,7 +13,7 @@
 <% }%>
 <% if(orderData.length===0){ %>
 <div class="text-center mt-5 pt-5">
-  <h5>No Order Yet!</h5>
+  <h5>No Order Pending!</h5>
 <p>Enjoy Shopping With Us</p>
 <a href="/shop" class="btn btn-light  border mt-2"> Shop Now </a>
 </div>
@@ -21,8 +21,15 @@
 
 <div class="container mt-5 pt-5">
   <div class="row">
-    <div class="col-12">
-    <% orderData.forEach(order => {  
+    <div class="col-9">
+      <div class="orderBtns mb-3  flex gap-3">
+        <button class="btn" onclick="getOrderByCategory('all')">Orders</button>
+        <button class="btn view-button" onclick="getOrderByCategory('Delivered')">Delivered</button>
+        <button class="btn view-button" onclick="getOrderByCategory('Cancelled')">Cancelled</button>
+        <button class="btn view-button" onclick="getOrderByCategory('Returned')">Retuened</button>
+      </div>
+    <div id="orderContent">
+      <% orderData.forEach(order => {  
         const totalProduct = order.products.length
         const productImage = order.products[0].product_image
         %>
@@ -69,7 +76,7 @@
           </div>
           <div>
             <div class="row">
-              <div class="col-md-8">
+              <div class="col-md-6">
                 <div class="mt-3">
                   <h6 class="mb-0 mt-1">Total Amount : <span class="fw-medium color"> ₹
                       <%=order.totalPrice %></span></h6>
@@ -77,10 +84,10 @@
                     <%=order.paymentMethod %></span></p>
                 </div>
               </div>
-              <div class="col-md-4 d-flex gap-5 align-items-center">
+              <div class="col-md-6 d-flex gap-5 align-items-center">
                 <div class="mt-3">
                     <% if(order.orderStatus!=='Delivered' && order.orderStatus!=='Returned' && order.orderStatus!=='Cancelled'){ %>
-                  <a href="#" class="btn" onclick="cancelOrder('<%= order._id%>')">Cancel Order</a>
+                  <a href="#" class="  border p-3 border-round" onclick="cancelOrder('<%= order._id%>')">Cancel Order</a>
                   <% } else if(order.orderStatus==='Delivered'){%>
                     <a href="/return-order/<%= order._id%>" class="btn">Return Order</a>
                     <% } %>
@@ -98,6 +105,12 @@
       <!-- end card -->
 <% }); %>
     </div>
+    </div>
+    <div class="col-3">
+      <div class="mt-5">
+        
+        </div>
+      </div>
   </div>
   <!-- end row -->
 
@@ -165,4 +178,108 @@
     } catch (error) {
         console.error('Error downloading report:', error);
     }
-}</script>
+
+    
+}
+async function getOrderByCategory(orderStatus) {
+  try {
+    if(orderStatus==='all')
+    {
+      orderStatus = {$in:['Confirmed', 'Pending', 'Delivered', 'Returned', 'Cancelled','Shipped']}
+    }
+    const response = await fetch('/order-by-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ orderStatus })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const orderData = await response.json();
+
+    // Select the div to replace content
+    const orderContent = document.getElementById('orderContent');
+
+    // Check if orderData is available and has elements
+    if (orderData && orderData.length > 0) {
+      // Generate HTML dynamically
+      let content = '';
+      orderData.forEach(order => {
+        const totalProduct = order.products.length;
+        const productImage = order.products[0].product_image;
+        const orderStatusIcon = {
+          'Pending': 'text-warning',
+          'Confirmed': 'text-info',
+          'Returned': 'text-dark',
+          'Delivered': 'text-success',
+          'Cancelled': 'text-danger'
+        }[order.orderStatus] || 'text-secondary';
+
+        content += `
+        <div class="card border shadow-none mb-3">
+          <div class="card-body">
+            <div class="d-flex align-items-start border-bottom pb-3">
+              <div class="me-4">
+                <img src="../../${productImage}" alt="" class="avatar-lg rounded order-product-img">
+              </div>
+              <div class="flex-grow-1 align-self-center overflow-hidden">
+                <div>
+                  <h6 class="text-truncate font-size-18"><a href="#" class="text-dark">Order Id : #${order.order_id}</a></h6>
+                  <p class="mb-0 mt-1">Order Date : <span class="fw-medium">20-3-2023</span></p>
+                  <p class="mb-0 mt-1">Total Products : <span class="color">${totalProduct}</span></p>
+                </div>
+              </div>
+              <div class="flex-grow-1 align-self-center overflow-hidden">
+                <div>
+                  <p class="mb-0">
+                    <i class='bx bxs-circle ${orderStatusIcon}'></i> 
+                    ${order.orderStatus}
+                  </p>
+                </div>
+              </div>
+              <div class="flex-grow-1 align-self-center overflow-hidden">
+                <div>
+                  <a href="/view-order/${order._id}" class="btn view-button">View Details <i class='bx bx-right-arrow-alt'></i></a>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mt-3">
+                    <h6 class="mb-0 mt-1">Total Amount : <span class="fw-medium color">₹${order.totalPrice}</span></h6>
+                    <p class="mb-0 mt-1 color">Payment : <span class="fw-medium">${order.paymentMethod}</span></p>
+                  </div>
+                </div>
+                <div class="col-md-6 d-flex gap-5 align-items-center">
+                  <div class="mt-3">
+                    ${order.orderStatus !== 'Delivered' && order.orderStatus !== 'Returned' && order.orderStatus !== 'Cancelled' ? `<a href="#" class="border p-3 border-round" onclick="cancelOrder('${order._id}')">Cancel Order</a>` : ''}
+                    ${order.orderStatus === 'Delivered' ? `<a href="/return-order/${order._id}" class="btn">Return Order</a>` : ''}
+                  </div>
+                  <div class="mt-3">
+                    ${order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Returned' ? `<a onclick="downloadInvoice('${order._id}')" class="color h6" style="cursor: pointer;"><i class='bx bx-download'></i> Invoice</a>` : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      });
+
+      // Replace the content of the div
+      orderContent.innerHTML = content;
+    } else {
+      // Handle the case where no orders are found
+      orderContent.innerHTML = `<h6 class="text-center mt-5">No ${orderStatus.toLowerCase()} orders found.</h6>`;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    const orderContent = document.getElementById('orderContent');
+    orderContent.innerHTML = `<p>An error occurred while fetching orders.</p>`;
+  }
+}   
+    </script>

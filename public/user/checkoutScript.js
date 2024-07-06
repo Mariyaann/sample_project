@@ -85,12 +85,16 @@
                     "modal": {
                         "ondismiss": function () {
                             console.log("Payment failed or was dismissed.");
-                            // window.location.href = `/checkout`;
+                            
                         }
                     }
                 };
 
                 const rzp1 = new Razorpay(options);
+                rzp1.on('payment.failed', async function (response){
+                  document.getElementById('paymentStatus').value = 'failed'
+                  document.getElementById('check-out-form').submit();
+                })
                 rzp1.open();
             }else {
                             throw new Error("Order ID not received");
