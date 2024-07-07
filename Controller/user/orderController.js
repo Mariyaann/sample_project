@@ -58,6 +58,8 @@ const viewOrderDetails = async (req,res)=>{
     let notification={}
      const customer_id = req.session.user;
     const order_id = req.params.id;
+    console.log(order_id)
+
     try
     {
         const productData = await orderCollection.findOne({ _id : order_id,customer_id:customer_id })
@@ -65,6 +67,7 @@ const viewOrderDetails = async (req,res)=>{
     }
     catch(error)
     {
+        console.log(error)
         globalNotification={
             status: "error",
             message: "Something went Wrong"
@@ -251,7 +254,40 @@ const downloadInvoice = async (req, res) => {
     }
 };
 
+const cancelPendingOrder = async (req,res)=>{
+    const order_id = req.params.id;
+    const user_id = req.session.user;
+    try
+    {
+        if(order_id)
+        {
+            const deleteOrder = await orderCollection.findOneAndDelete({_id: new ObjectId(order_id),customer_id: user_id})
+            if(deleteOrder)
+            {
+                globalNotification={
+                    status:'success',
+                    message:'Order Cancelled Successfully'
+                }
+            }else
+            globalNotification={
+                status:'error',
+                message:'Something went wrong try again !'
+            }
 
+        }
+        else
+        {
+            globalNotification={
+                status:'error',
+                message:'Order is not valid Try Again !'
+            }
+        }
+    }catch(err)
+    {
+        console.log(err)
+    }
+    res.redirect('/orders')
+}
 
 // -------------------------------------- Other functions ------------------------- 
 
@@ -290,5 +326,6 @@ viewOrders,
 viewOrderDetails,
 cancelOrder,
 downloadInvoice,
-orderByStatus
+orderByStatus,
+cancelPendingOrder
 }

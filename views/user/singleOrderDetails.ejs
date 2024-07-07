@@ -77,7 +77,7 @@
                 </div>
             </div>
             <% }); %>
-
+            
             
             
         </div>
@@ -123,6 +123,12 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            <% if(productData.orderStatus ==='Payment Pending'){ %>
+                <div class="flex mt-3" >
+                  <a href="/cancel-pending-order/<%= productData._id %>" class="  border p-3 border-round" >Cancel Order</a>
+                  <a href="#" class="border rounded p-3  btn-success" onclick="paynow('<%= productData._id%>')">Re-Payment</a>
+                </div>
+            <% } %>
                         </div>
                         <!-- end table-responsive -->
                     </div>

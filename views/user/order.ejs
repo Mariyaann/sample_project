@@ -19,7 +19,7 @@
 </div>
 <%  } else {%>
 
-<div class="container mt-5 pt-5">
+<div class="container-fluid mt-5 pt-5">
   <div class="row">
     <div class="col-9">
       <div class="orderBtns mb-3  flex gap-3">
@@ -106,9 +106,54 @@
 <% }); %>
     </div>
     </div>
-    <div class="col-3">
-      <div class="mt-5">
-        
+    <div class="col-3 mt-4">
+      <div class="">
+      <h5>Pending payments</h5>
+
+        <% if(pendingOrders.length <= 0){ %>
+          <h6>No Pending payment orders</h2>
+        <% }else{ pendingOrders.forEach((order)=>{ 
+          const totalProduct = order.products.length
+          const productImage = order.products[0].product_image
+        %>
+          <div class="card border shadow-none mb-3 mt-3">
+        <div class="card-body">
+          <div class="d-flex align-items-start border-bottom pb-3">
+            <div class="me-4">
+              <img src="../../<%= productImage %>" alt="" class="avatar-lg rounded order-product-img">
+            </div>
+            <div class="flex-grow-1 align-self-center overflow-hidden">
+              <div>
+                <h6 class="text-truncate font-size-18"><a href="#" class="color"> #<%= order.order_id%></a></h6>
+                <p class="mb-0 mt-1"><span class="fw-medium">
+                    20-3-2023</span></p>
+                <p class="mb-0 mt-1">Amount : <span class="color"> ₹ <%=order.totalPrice %> </span></p>
+                <a href="/view-order/<%= order._id %>" >View Details <i class='bx bx-right-arrow-alt'></i></a>
+                
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mt-3 pt-3 pb-3">
+                  <a href="/cancel-pending-order/<%= order._id%>" class="  border p-3 border-round">Cancel Order</a>
+                  
+                </div>
+              </div>
+              <div class="col-md-6 d-flex gap-5 align-items-center">
+                <div class="mt-3 pt-3 pb-3">
+                    
+                  <a href="#" class="border rounded p-3  btn-success" onclick="paynow('<%= order._id%>')">Re-Payment</a>
+                  
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+        <%})} %>
         </div>
       </div>
   </div>

@@ -1218,3 +1218,6 @@ a{
   .border-round:hover{
     background-color: #eeeeee;
   }
+  .rounded{
+    border-radius: 25px !important;
+  }
