@@ -25,6 +25,10 @@
         const email = document.getElementsByName('customer_emailid')[0].value
         const phone = document.getElementsByName('phonenumber')[0].value
         const paymentMethod= document.getElementById('pay-methodoption1');
+
+        if(paymentMethod.value==='razorpay')
+        
+
         if(paymentMethod.checked  && paymentMethod.value==='razorpay')
         {
             
@@ -106,6 +110,26 @@
         });
         }
         else{
+        const totalPrice = document.getElementById('total-price').getAttribute('data-price');
+        const walletMethod= document.getElementById('pay-methodoption2');
+        const codMethod= document.getElementById('pay-methodoption3');
+        const wallet_amount = walletMethod.getAttribute('data-wallet-amount')
+
+        if((codMethod.checked && codMethod.value === 'Cash on delivery' &&totalPrice > 1000))
+        {
+          Swal.fire({
+            icon: "error",
+            text: "Cash On Delivery is not Applicable for order above 1000. Please choose another one"
+          });
+        }
+        else if(walletMethod.checked && walletMethod.value === 'Wallet' && totalPrice > wallet_amount )
+        {
+          Swal.fire({
+            icon: "error",
+            text: "Your available wallet balance is Low. Please choose another one "
+          });
+        }
+        else
             document.getElementById('check-out-form').submit();
         }
     })

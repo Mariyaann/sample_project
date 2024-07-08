@@ -193,7 +193,7 @@
                                         <div class="col-lg-3 col-sm-6">
                                             <div data-bs-toggle="collapse">
                                                 <label class="card-radio-label">
-                                                    <input type="radio" name="pay_method" id="pay-methodoption1" class="card-radio-input" value="razorpay" id="rzp-button">
+                                                    <input type="radio" name="pay_method" id="pay-methodoption1" checked="" class="card-radio-input" value="razorpay" id="rzp-button">
                                                     <span class="card-radio py-3 text-center text-truncate">
                                                         <!-- <i class="bx bx-credit-card d-block h2 mb-3"></i> -->
                                                          <img src="../../user/assets/web-img/razorpay (2).png" alt="" class="img-fluid d-block mb-3">
@@ -219,7 +219,7 @@
                                         <div class="col-lg-3 col-sm-6">
                                             <div>
                                                 <label class="card-radio-label">
-                                                    <input type="radio" name="pay_method" id="pay-methodoption3" class="card-radio-input" checked="" value="Cash on delivery">
+                                                    <input type="radio" name="pay_method" id="pay-methodoption3" class="card-radio-input"  value="Cash on delivery">
 
                                                     <span class="card-radio py-3 text-center text-truncate">
                                                         <i class="bx bx-money d-block h2 mb-3"></i>
@@ -394,17 +394,32 @@
     checkPayments();
     function checkPayments(){
         const totalPrice = document.getElementById('total-price').getAttribute('data-price')
+        const razorpay_btn = document.getElementById('pay-methodoption1')
         const wallet_button = document.getElementById('pay-methodoption2')
+        const cod_button = document.getElementById('pay-methodoption3')
         const wallet_amount = wallet_button.getAttribute('data-wallet-amount')
         console.log("totalPrice",totalPrice)
         console.log("wallet_amount",wallet_amount)
         if(totalPrice <= wallet_amount)
         {
             wallet_button.setAttribute('enabled','enabled')
-            wallet_button.removeAttribute('disabled','')
+            wallet_button.removeAttribute('disabled','disabled')
         }else{
-            wallet_button.setAttribute('enabled','')
+            wallet_button.removeAttribute('enabled','enabled')
             wallet_button.setAttribute('disabled','disabled')
+            razorpay_btn.setAttribute('checked','checked')
+        }
+        if(totalPrice>1000)
+        {
+            cod_button.setAttribute('disabled','disabled');
+            cod_button.removeAttribute('enabled','enabled')
+            cod_button.removeAttribute('checked','')
+            razorpay_btn.setAttribute('checked','checked')
+
+        }
+        else{
+            cod_button.setAttribute('enabled','enabled');
+            cod_button.removeAttribute('disabled','disabled')
         }
     }
 </script>

@@ -351,6 +351,10 @@ const repaymentSuccess = async (req,res)=>{
         return res.status(500).json({ message: `Error: ${err.message}` });
     }
 }
+
+const failed = (req,res)=>{
+    res.render('./user/order-failed')
+}
 // -------------------------------------- Other functions ------------------------- 
 
 // ------------------- Recheck order STatus --------------- 
@@ -391,5 +395,5 @@ downloadInvoice,
 orderByStatus,
 cancelPendingOrder,
 retryPaymentRazorpay,
-repaymentSuccess
+repaymentSuccess,
 }
