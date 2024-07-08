@@ -375,6 +375,23 @@ const failed = (req,res)=>{
             const updateOrder = await orderCollection.findOneAndUpdate({_id : new ObjectId(orderId),customer_id: new ObjectId(userId)},{$set:{orderStatus:'Returned'}})
             if(updateOrder)
             {
+                if(orderDetails.paymentMethod === 'Wallet'){
+                    const transaction_details = {
+                        wallet_amount: orderDetails.totalPrice,
+                        order_id: orderDetails.order_id,
+                        transactionType: 'Credited'
+                    };
+                    const checkWallet = await walletCollection.findOne({ customer_id: updateStatus.customer_id });
+                if (checkWallet) {
+                    await walletCollection.findOneAndUpdate(
+                        { customer_id: userId },
+                        { 
+                            $inc: { wallet_balance: transaction_details.wallet_amount },
+                            $push: { transaction: transaction_details }
+                        }
+                    );
+                }
+                }
                 globalNotification={
                     status:'success',
                     message:'order returning Initialized'
@@ -398,6 +415,8 @@ const failed = (req,res)=>{
     }
     res.redirect('/orders')
  }
+
+
 // -------------------------------------- Other functions ------------------------- 
 
 // ------------------- Recheck order STatus --------------- 

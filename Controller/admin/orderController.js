@@ -26,7 +26,7 @@ const showOrders = async (req,res)=>{
             }
             else
             {
-                query= {orderStatus:-1, createdAt:-1}
+                query= {createdAt:-1}
             }
     try
     {
