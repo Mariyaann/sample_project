@@ -355,6 +355,49 @@ const repaymentSuccess = async (req,res)=>{
 const failed = (req,res)=>{
     res.render('./user/order-failed')
 }
+
+
+// --------------------------- Return order --------------------- 
+
+ const returnOrder = async (req,res)=>{
+    const orderId = req.params.id;
+    const userId = req.session.user
+    try{
+        const orderDetails = await orderCollection.findOne({_id : new ObjectId(orderId),customer_id: new ObjectId(userId)})
+        if(orderDetails){
+            for (const product of orderDetails.products) {
+                
+                    await productCollection.findOneAndUpdate(
+                        { _id: product.product_id },
+                        { $inc: { product_stock: product.product_quantity } }
+                    );
+                }
+            const updateOrder = await orderCollection.findOneAndUpdate({_id : new ObjectId(orderId),customer_id: new ObjectId(userId)},{$set:{orderStatus:'Returned'}})
+            if(updateOrder)
+            {
+                globalNotification={
+                    status:'success',
+                    message:'order returning Initialized'
+                }
+            }
+        }
+        else
+        {
+            globalNotification={
+                status:'error',
+                message:'Unable to find the product Try again'
+            }
+        }
+    }
+    catch(err){
+        console.log(err);
+        globalNotification={
+            status:'error',
+            message:'Unable to return the Product Try again'
+        }
+    }
+    res.redirect('/orders')
+ }
 // -------------------------------------- Other functions ------------------------- 
 
 // ------------------- Recheck order STatus --------------- 
@@ -396,4 +439,5 @@ orderByStatus,
 cancelPendingOrder,
 retryPaymentRazorpay,
 repaymentSuccess,
+returnOrder
 }
