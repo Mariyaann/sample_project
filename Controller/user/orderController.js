@@ -1,7 +1,8 @@
 const orderCollection = require('../../Schema/orderModel')
 const productCollection = require('../../Schema/productModel')
 const walletCollection = require('../../Schema/walletModel')
-const PDFDocument = require('pdfkit')
+const PDFDocument = require('pdfkit');
+const Razorpay = require('razorpay');
 const { ObjectId } = require("mongodb");
 let globalNotification ={}
 
@@ -288,7 +289,68 @@ const cancelPendingOrder = async (req,res)=>{
     }
     res.redirect('/orders')
 }
+// ------------------------------ Retry payment ------------------------------- 
 
+const retryPaymentRazorpay = async (req, res) => {
+    const order_id = req.body.orderId;
+    const user_id = req.session.user;
+  
+    try {
+      const orderData = await orderCollection.findOne({ _id: new ObjectId(order_id), customer_id: user_id });
+      if (!orderData) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+      
+      const amountInPaise = Math.round(orderData.totalPrice * 100); // Round to nearest integer
+  
+      const instance = new Razorpay({
+        key_id: 'rzp_test_1CXfduMW9euDd9',
+        key_secret: 'dWBgdxhz2Xul2cGWrli9UDh0',
+      }); 
+  
+      instance.orders.create({
+        amount: amountInPaise, // Amount in paise
+        currency: 'INR',
+        receipt: `receipt#${order_id}`,
+      }, (err, order) => {
+        if (err) {
+          // Log the complete error object for debugging
+          console.error('Failed to create order:', err);
+          // Send a detailed error message to the client
+          return res.status(500).json({ message: `Failed to create order: ${err.message}` });
+        }
+  
+        // If there is no error then send back the order id and total price
+        return res.status(200).json({ orderID: order.id, totalPrice: orderData.totalPrice });
+      });
+    } catch (err) {
+      // Log the error for debugging
+      console.error('Error:', err);
+      // Send a detailed error message to the client
+      return res.status(500).json({ message: `Error: ${err.message}` });
+    }
+  };
+
+
+// -------------------- Retry payment success ------------------------------------ 
+
+const repaymentSuccess = async (req,res)=>{
+    const orderId = req.body.orderId;
+    const userId = req.session.user
+
+    console.log("orderId",orderId)
+    console.log("userId",userId)
+    try
+    {
+        const updateOrder = await orderCollection.findOneAndUpdate({_id: new ObjectId(orderId), customer_id:new ObjectId(userId) },{$set:{orderStatus: 'Pending'}});
+        console.log(updateOrder);
+        return res.status(200).json({message : 'success'})
+    }catch(err)
+    {
+        console.log(err);
+        return res.status(500).json({ message: `Error: ${err.message}` });
+    }
+}
 // -------------------------------------- Other functions ------------------------- 
 
 // ------------------- Recheck order STatus --------------- 
@@ -327,5 +389,7 @@ viewOrderDetails,
 cancelOrder,
 downloadInvoice,
 orderByStatus,
-cancelPendingOrder
+cancelPendingOrder,
+retryPaymentRazorpay,
+repaymentSuccess
 }

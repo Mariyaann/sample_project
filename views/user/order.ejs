@@ -26,7 +26,7 @@
         <button class="btn" onclick="getOrderByCategory('all')">Orders</button>
         <button class="btn view-button" onclick="getOrderByCategory('Delivered')">Delivered</button>
         <button class="btn view-button" onclick="getOrderByCategory('Cancelled')">Cancelled</button>
-        <button class="btn view-button" onclick="getOrderByCategory('Returned')">Retuened</button>
+        <button class="btn view-button" onclick="getOrderByCategory('Returned')">Returned </button>
       </div>
     <div id="orderContent">
       <% orderData.forEach(order => {  
@@ -108,10 +108,10 @@
     </div>
     <div class="col-3 mt-4">
       <div class="">
-      <h5>Pending payments</h5>
+      <h5>Payment Pending Orders </h5>
 
         <% if(pendingOrders.length <= 0){ %>
-          <h6>No Pending payment orders</h2>
+          <h6 class="mt-4">No  orders</h2>
         <% }else{ pendingOrders.forEach((order)=>{ 
           const totalProduct = order.products.length
           const productImage = order.products[0].product_image
@@ -161,6 +161,8 @@
 
 </div>
 <% } %>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="../../user/orderScript.js"></script>
 <script>
   function cancelOrder(order_id){
     Swal.fire({

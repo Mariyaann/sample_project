@@ -77,6 +77,8 @@ router.post('/razorpay-order',userSessionCheck,cartController.razorpayOrder)
 router.get('/payment-success/:id/:orderId',userSessionCheck,cartController.updateOrderPayment)
 router.post('/order-by-status',userSessionCheck,orderController.orderByStatus);
 router.get('/cancel-pending-order/:id',userSessionCheck,orderController.cancelPendingOrder)
+router.post('/repayment-razorpay',userSessionCheck,orderController.retryPaymentRazorpay)
+router.post('/retry-payment-success',userSessionCheck,orderController.repaymentSuccess)
 
 
 // ---------------------------- wishlist section -------------------------------- 
