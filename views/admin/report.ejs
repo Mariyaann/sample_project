@@ -213,16 +213,11 @@
                 
                 <input type="date" id="endDate" name="endDate"  placeholder="End Date" class="border p-1">
             </div>
-            <select name="reportType" id="reportType" >
+            <select name="reportType" id="reportType"  >
                 <option value="monthly">Monthly</option>
                 <option value="yearly">Yearly</option>
                 <option value="weekly">Weekly</option>
-                <option value="custom">Custom Range</option>
             </select>
-
-            
-
-            <button type="submit" class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">Generate Report</button>
         </form>
         <canvas id="bars"></canvas>
         <div id="legend" class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400"></div>
@@ -342,27 +337,19 @@
         }
       });
     }
-        async function fetchMonthlySalesData(){
+        
 
+
+    document.getElementById('reportType').addEventListener('change',async (e)=>{
+        const reportRange =document.getElementById('reportType').value;
+        if(reportRange === 'yearly')
+        {
+          fetchSalesData()
         }
-
-
-    document.getElementById('reportType').addEventListener('change',(e)=>{
-        const customRange = document.getElementById('customRange');
-        const reportValue = document.getElementById('reportType').value
-        console.log(reportValue)
-        if(reportValue === 'custom')
-        customRange.style.display='inline-block'
-        if(reportValue === 'custom')
-        fetchSalesData();
-    else if(reportValue === 'Monthly')
-        fetchMonthlySalesData()
-        else if(reportValue === 'yearly')
-        fetchYearlySalesData()
-        else if(reportValue === 'weekly')
-        fetchweeklySalesData()
-        else if(reportValue === 'custom')
-        fetchCustomSalesData()
+        else
+        {
+          
+        }
     })
 
     async function getOrderData() {

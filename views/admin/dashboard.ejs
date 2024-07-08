@@ -203,7 +203,7 @@
         ];
         const salesData = Array(12).fill(0);
         const countData = Array(12).fill(0);
-
+        console.log("==================================================",data,)
         data.forEach(item => {
           salesData[item._id.month - 1] = item.totalSales;
           countData[item._id.month - 1] = item.count;
@@ -216,34 +216,38 @@
     }
 
     function renderBarChart(labels, salesData, countData) {
-      const ctx = document.getElementById('bars').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Sales',
-              data: salesData,
-              backgroundColor: '#1E3A8A' // Customize color as needed
-            },
-            {
-              label: 'Count of Purchases',
-              data: countData,
-              backgroundColor: '#14B8A6' // Customize color as needed
-            }
-          ]
+  const ctx = document.getElementById('bars').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Sales',
+          data: salesData,
+          backgroundColor: '#1E3A8A' // Customize color as needed
         },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
+        {
+          label: 'Count of Purchases',
+          data: countData,
+          backgroundColor: '#14B8A6' // Customize color as needed
+        }
+      ]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return value; // Ensure the tick values are displayed correctly
             }
           }
         }
-      });
+      }
     }
-
+  });
+}
     fetchData();
     fetchSalesData();
 

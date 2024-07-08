@@ -66,7 +66,7 @@ router.post('/add-offer',adminSessionCheck,offerController.addOffer)
 router.get('/removeOffer/:id',adminSessionCheck,offerController.removeOffer) 
 
 
-// ----------------------- Report section --------------------- 
+// ----------------------- Report section ---------------------  
 
 router.get('/report',adminSessionCheck,reportController.reportPage)
 router.get('/getreport',adminSessionCheck,reportController.getPieChart)
