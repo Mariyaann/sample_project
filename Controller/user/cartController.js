@@ -616,7 +616,7 @@ const checkOut = async (req, res) => {
                     totalPrice = totalPrice - coupenData.coupen_offer_amount
                   }else if(coupenData.coupen_type === 'Percentage' &&  totalPrice>=coupenData.coupen_amount_limit)
                   {
-                    totalPrice = totalPrice -(totalPrice * (coupenData.coupen_offer_amount) ) 
+                    totalPrice = totalPrice -(totalPrice * ((coupenData.coupen_offer_amount) /100)) 
                   }
                   totalPrice= totalPrice.toFixed(2)
                 orderData.isCoupen = true;

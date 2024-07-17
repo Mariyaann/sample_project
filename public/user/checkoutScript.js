@@ -159,46 +159,50 @@ view_coupen.addEventListener('click', () => {
     couponDivs.style.display = couponDivs.style.display === 'none' ? 'block' : 'none';
 
     if (couponDivs.style.display === 'block') {
-      couponDivs.innerHTML = data.map(coupon => {
-        // Example conditional check based on coupon properties
-        
-        let couponContent = '';
-        if (coupon.coupen_type == "Flat OFF") {
-          couponContent = `
-            <a href="#" data-coupen-id='${coupon._id}' onclick='selectedCoupen("${coupon._id}","${coupon.coupen_code}")'><div class="coupon">
-              <div class="coupon-left">
-                
-                <h2 class="color"> ₹ ${coupon.coupen_offer_amount}</h2>
-                <p>FLAT OFF</p>
-              </div>
-              <div class="coupon-right">
-                <div class="coupon-code color">
-                  <h5 class="color">${coupon.coupen_code}</h5>
-                  <small>Use the Coupen above orders ${coupon.coupen_amount_limit} </small>
+      if(data.length === 0)
+        couponDivs.innerHTML='No Available Coupens';
+      else{
+        couponDivs.innerHTML = data.map(coupon => {
+          // Example conditional check based on coupon properties
+          
+          let couponContent = '';
+          if (coupon.coupen_type == "Flat OFF") {
+            couponContent = `
+              <a href="#" data-coupen-id='${coupon._id}' onclick='selectedCoupen("${coupon._id}","${coupon.coupen_code}")'><div class="coupon">
+                <div class="coupon-left">
+                  
+                  <h2 class="color"> ₹ ${coupon.coupen_offer_amount}</h2>
+                  <p>FLAT OFF</p>
+                </div>
+                <div class="coupon-right">
+                  <div class="coupon-code color">
+                    <h5 class="color">${coupon.coupen_code}</h5>
+                    <small>Use the Coupen above orders ${coupon.coupen_amount_limit} </small>
+                  </div>
                 </div>
               </div>
-            </div>
-            </a>
-          `;
-        } else {
-          couponContent = `
-            <a href="#" data-coupen-id='${coupon._id}' onclick='selectedCoupen("${coupon._id}","${coupon.coupen_code}")'><div class="coupon">
-              <div class="coupon-left">coupen
-                <h2 class="color">${coupon.coupen_offer_amount}%</h2>
-                <p>DISCOUNT</p>
-              </div>
-              <div class="coupon-right">
-                <div class="coupon-code ">
-                  <h5 class="color">${coupon.coupen_code}</h5>
-                  <small>Use the Coupen above orders ${coupon.coupen_amount_limit} </small>
+              </a>
+            `;
+          } else {
+            couponContent = `
+              <a href="#" data-coupen-id='${coupon._id}' onclick='selectedCoupen("${coupon._id}","${coupon.coupen_code}")'><div class="coupon">
+                <div class="coupon-left">coupen
+                  <h2 class="color">${coupon.coupen_offer_amount}%</h2>
+                  <p>DISCOUNT</p>
                 </div>
-               
-              </div>
-            </div></a>
-          `;
-        }
-        return couponContent;
-      }).join('');
+                <div class="coupon-right">
+                  <div class="coupon-code ">
+                    <h5 class="color">${coupon.coupen_code}</h5>
+                    <small>Use the Coupen above orders ${coupon.coupen_amount_limit} </small>
+                  </div>
+                 
+                </div>
+              </div></a>
+            `;
+          }
+          return couponContent;
+        }).join('');
+      }
     } else {
       couponDivs.innerHTML = '';
     }

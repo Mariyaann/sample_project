@@ -10,9 +10,10 @@ const showShopPage = async (req, res) => {
   const category = req.query.category || "";
   const sortby = req.query.sortby || "";
   const search = req.query.search || "";
+  const page = parseInt(req.query.page) || 1; // Current page number
+  const limit = parseInt(req.query.limit) || 6; // Number of items per page
 
   try {
-      // Fetch category data
       const categoryData = await productCollection.aggregate([
           { $match: { product_status: 1 } },
           {
@@ -32,7 +33,6 @@ const showShopPage = async (req, res) => {
           }
       ]);
 
-      // Prepare query and sort conditions
       let query = { product_status: 1 };
       let sort = {};
 
@@ -65,10 +65,14 @@ const showShopPage = async (req, res) => {
               sort.timestamp = -1;
       }
 
-      // Fetch products based on query and sort
-      let productData = await productCollection.find(query).sort(sort);
+      const totalProducts = await productCollection.countDocuments(query);
+      const totalPages = Math.ceil(totalProducts / limit);
 
-      // Check offers for each product
+      let productData = await productCollection.find(query)
+          .sort(sort)
+          .skip((page - 1) * limit)
+          .limit(limit);
+
       productData = await Promise.all(productData.map(async (product) => {
           const productOffers = await offerCollection.find({ product_id: product._id }).sort({ offer_percentage: -1 }).limit(1);
           const categoryOffers = await offerCollection.find({ category_id: product.category_id }).sort({ offer_percentage: -1 }).limit(1);
@@ -84,11 +88,10 @@ const showShopPage = async (req, res) => {
               offerType = 'Category';
           }
 
-          // Calculate discounted price if there is an offer
           if (bestOffer) {
               const discountedPrice = product.product_price - (product.product_price * (bestOffer.offer_percentage / 100));
               return {
-                  ...product.toObject(), // Convert Mongoose document to plain JavaScript object
+                  ...product.toObject(),
                   discounted_price: discountedPrice,
                   offer_percentage: bestOffer.offer_percentage,
                   offer_type: offerType,
@@ -97,40 +100,38 @@ const showShopPage = async (req, res) => {
           } else {
               return {
                   ...product.toObject(),
-                  discounted_price: product.product_price, // No discount
+                  discounted_price: product.product_price,
                   offer_percentage: 0,
                   offer_type: '',
                   offer_name: ''
               };
           }
       }));
-  
-      // Check if user is logged in and fetch wishlist
+
       if (req.session.user) {
           const customerId = req.session.user;
 
-
           productData = await Promise.all(productData.map(async (product) => {
-            const wishlist = await wishlistCollection.find({ customer_id: customerId, product_id: product._id });
-            if (wishlist.length>0) {
-              product['isWishlist'] = true;
-            } else {
-              product['isWishlist'] = false;
-            }
-            return product;
+              const wishlist = await wishlistCollection.find({ customer_id: customerId, product_id: product._id });
+              product['isWishlist'] = wishlist.length > 0;
+              return product;
           }));
-        }
-      
+      }
 
-      // Render or send JSON response (depending on your application flow)
-      // res.json({ categoryData, productData, category });
-      
-      res.render('./user/shop', { categoryData, productData, category });
+      res.render('./user/shop', {
+          categoryData,
+          productData,
+          category,
+          currentPage: page,
+          totalPages,
+          limit
+      });
   } catch (err) {
       console.log(err);
       res.status(500).json({ 'Message': "Internal Server Error" });
   }
 };
+
 
 
 
@@ -142,6 +143,7 @@ const showWIthFilter = async (req, res) => {
     minAmount: req.body.minPrice,
     maxAmount: req.body.maxPrice
   };
+  let currentPage =1;
   
   let query = {
     product_status: { $ne: -1 },
@@ -157,7 +159,7 @@ const showWIthFilter = async (req, res) => {
   }
 
   try {
-    console.log(query);
+   
     const categoryData = await productCollection.aggregate([
       {$match:{product_status:1}},
       {
@@ -178,7 +180,8 @@ const showWIthFilter = async (req, res) => {
     ]);
 
     const productData = await productCollection.find(query).sort({ timestamp: -1 });
-    res.render('./user/shop', { categoryData, productData, category });
+    
+    res.render('./user/shop', { categoryData, productData, category ,currentPage,totalPages:1,limit:6});
   } catch (err) {
     console.log(err);
   }

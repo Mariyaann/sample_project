@@ -13,13 +13,12 @@
     
 <% const expiry = convertDateString(coupenData.coupen_expiry);
 let minDate = convertDateString(new Date()); %>
-<%= expiry %>
 <div class="container">
     <div class="col-8 offset-2">
-        <form action="/admin/update-coupen/<%= coupenData._id %>" method="post" >
+        <form action="/admin/update-coupen/<%= coupenData._id %>" method="post" id="coupen-edit-form">
             <label class="block text-sm mb-3 mt-5">
                 <span class="text-gray-700 dark:text-gray-400">Coupen Name</span>
-                <input class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="coupen_name" type="text" required value="<%= coupenData.coupen_name %>" />
+                <input class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="coupen_name" id="coupen_name" type="text" required value="<%= coupenData.coupen_name %>" />
             </label>
 
             <label class="block text-sm mb-3 mt-3">
@@ -34,7 +33,7 @@ let minDate = convertDateString(new Date()); %>
             
             <label class="block text-sm mb-3">
                 <span class="text-gray-700 dark:text-gray-400">Coupen Type</span>
-                <select class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="coupen_type" required>
+                <select class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="coupen_type" id="coupen_type" required>
                     <option selected disabled>Select a Type</option>
                     <option value="Flat OFF">Flat OFF</option>
                     <option value="Percentage">Percentage</option>
@@ -43,7 +42,7 @@ let minDate = convertDateString(new Date()); %>
 
             <label class="block text-sm mb-3">
                 <span class="text-gray-700 dark:text-gray-400">Offer Amount / Percentage</span>
-                <input class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="coupen_offer_amount" type="text" value="<%= coupenData.coupen_offer_amount %>" required />
+                <input class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" name="coupen_offer_amount" id="coupen_offer_amount" type="text" value="<%= coupenData.coupen_offer_amount %>" required />
             </label>
             
             <div class="modal-footer">
@@ -54,3 +53,27 @@ let minDate = convertDateString(new Date()); %>
     </div>
 </div>
 
+<script>
+    document.getElementById('submit-btn').addEventListener('click',(e)=>{
+        e.preventDefault()
+        const coupen_name = document.getElementById('coupen_name').value;
+        const coupen_type = document.getElementById('coupen_type').value;
+        let coupenOfferAmount = parseFloat(document.getElementById('coupen_offer_amount').value);
+
+
+        if(coupen_name.trim() == "")
+        alert('Coupen name cant be empty')
+
+        else if(coupen_type =="")
+        alert('coupen type required')
+        else if(coupen_type =="")
+        alert('coupen type required')
+     else if (coupen_type === 'Percentage' && coupenOfferAmount > 99 ||  coupenOfferAmount<=0) {
+      errorMessage = ' Offer amount should be Between 1% - 99%  for Percentage type.';
+    }
+    else{
+        document.getElementById('coupen-edit-form').submit()
+    }
+
+    })
+</script>

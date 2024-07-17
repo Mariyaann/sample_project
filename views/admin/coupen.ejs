@@ -284,8 +284,8 @@ let minDate = convertDateString(new Date());
     
     else if (coupenType === 'Flat OFF' &&  coupenOfferAmount >= coupenAmountLimit) {
       errorMessage = 'Offer amount should be less than the minimum amount for Flat OFF type.';
-    } else if (coupenType === 'Percentage' && coupenOfferAmount > 99 ||  coupenOfferAmount<0) {
-      errorMessage = ' Offer amount should be less than 99% for Percentage type.';
+    } else if (coupenType === 'Percentage' && coupenOfferAmount > 99 ||  coupenOfferAmount<=0) {
+      errorMessage = ' Offer amount should be Between 1% - 99%  for Percentage type.';
     }
 
     if (errorMessage) {
