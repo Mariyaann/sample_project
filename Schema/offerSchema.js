@@ -28,4 +28,4 @@ const offerSchema = mongoose.Schema({
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('offer', offerSchema);
+module.exports = mongoose.model('offers', offerSchema);

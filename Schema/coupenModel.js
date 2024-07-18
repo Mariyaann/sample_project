@@ -35,4 +35,4 @@ const coupenSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
-module.exports = mongoose.model('Coupens',coupenSchema)
+module.exports = mongoose.model('coupens',coupenSchema)

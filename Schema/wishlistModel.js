@@ -18,6 +18,6 @@ const wishlistSchema = new mongoose.Schema({
     }
 },{ timestamps: true })
 
-const cartCollection = mongoose.model('wishlist', wishlistSchema)
+const cartCollection = mongoose.model('wishlists', wishlistSchema)
 
-module.exports= cartCollection
+module.exports= cartCollection 

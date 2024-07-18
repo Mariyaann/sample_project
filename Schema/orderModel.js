@@ -2,14 +2,14 @@ const mongoose = require("mongoose");
 
 
 const schema = new mongoose.Schema({
-    customer_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+    customer_id: { type: mongoose.Schema.Types.ObjectId, ref: 'clients' },
     order_id: { 
         type: Number 
     },
     products: [{
         product_id: { 
             type: mongoose.Schema.Types.ObjectId ,
-            ref:"product"
+            ref:"products"
         },
         product_name: { 
             type: String 
@@ -65,7 +65,7 @@ const schema = new mongoose.Schema({
     },
     coupen_id:{
             type: mongoose.Schema.Types.ObjectId ,
-            ref:"Coupens",
+            ref:"coupens",
             required: false
     },
     paymentId: {
@@ -79,4 +79,4 @@ const schema = new mongoose.Schema({
 },{timestamps:true})
 
 
-module.exports = mongoose.model("Order", schema);
+module.exports = mongoose.model("orders", schema);
