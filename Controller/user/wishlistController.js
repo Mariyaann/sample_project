@@ -116,7 +116,8 @@ const wishlistToCart = async (req, res) => {
         });
         
 
-        if (findProduct) {
+        if (findProduct && findProduct.product_stock>0) {
+            
             const data = {
                 customer_id: userId,
                 product_id: productId,
