@@ -11,11 +11,12 @@
 
 
    <% 
-   if(userData.customer_address[0].length !== 0)
-        let  address= userData.customer_address; 
+   let address;
+   if (userData.customer_address[0].length !== 0)
+        address = userData.customer_address; 
    else
-        let  address= [{}]; 
-   %> 
+        address = [{}]; 
+%> 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css" integrity="sha256-NAxhqDvtY0l4xn+YVa6WjAcmd94NNfttjNsDmNatFVc=" crossorigin="anonymous" />
 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 <link rel="stylesheet" href="../../user/cart.css">
@@ -57,7 +58,7 @@
                                                     <div class="col-lg-4">
                                                         <div class="mb-3">
                                                             <label class="form-label" for="billing-phone">Phone</label>
-                                                            <input type="text" class="form-control" name="phonenumber" placeholder="Enter Phone no." value="<%=address[0].phonenumber %>">
+                                                            <input type="text" class="form-control" name="phonenumber" placeholder="Enter Phone no." value="<%= address[0].phonenumber %>">
                                                         </div>
                                                     </div>
                                                 </div>
