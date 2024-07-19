@@ -128,7 +128,11 @@
                                     <p class="text-muted text-truncate mb-4">Saved address</p>
                                     <div class="mb-3">
                                         <div class="row">
-                                            
+                                           <% if(address.length===0){
+                                            %>
+                                            <p>No Saved Address Found</p>
+                                            <%
+                                           } else{ %> 
                                                 <div class="col-lg-4 col-sm-6">
                                                     <a href="#" onclick="changeAddress('<%= JSON.stringify(address[0]) %>')">
                                                     <div data-bs-toggle="collapse">
@@ -175,7 +179,7 @@
                                                 </div>
                                             </div>
                                         
-                                            <% } %>
+                                            <% } } %>
                                             
                                         </div>
                                     </div>

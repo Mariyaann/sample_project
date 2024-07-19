@@ -157,7 +157,6 @@ const showWIthFilter = async (req, res) => {
   if (category) {
     query.category_id = category;
   }
-
   try {
    
     const categoryData = await productCollection.aggregate([
