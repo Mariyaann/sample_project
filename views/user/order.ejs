@@ -144,7 +144,7 @@
               <div class="col-md-6 d-flex gap-5 align-items-center">
                 <div class="mt-3 pt-3 pb-3">
                     
-                  <a href="#" class="border rounded p-3  btn-success" onclick="paynow('<%= order._id%>')">Re-Payment</a>
+                  <a href="#" class="border rounded p-2  btn-success" onclick="paynow('<%= order._id%>')">Re-Payment</a>
                   
                 </div>
                 
@@ -304,7 +304,7 @@ async function getOrderByCategory(orderStatus) {
                 </div>
                 <div class="col-md-6 d-flex gap-5 align-items-center">
                   <div class="mt-3">
-                    ${order.orderStatus !== 'Delivered' && order.orderStatus !== 'Returned' && order.orderStatus !== 'Cancelled' ? `<a href="#" class="border p-3 border-round" onclick="cancelOrder('${order._id}')">Cancel Order</a>` : ''}
+                    ${order.orderStatus !== 'Delivered' && order.orderStatus !== 'Returned' && order.orderStatus !== 'Cancelled' ? `<a href="#" class="border p-2 border-round" onclick="cancelOrder('${order._id}')">Cancel Order</a>` : ''}
                     ${order.orderStatus === 'Delivered' ? `<a href="/return-order/${order._id}" class="btn">Return Order</a>` : ''}
                   </div>
                   <div class="mt-3">
