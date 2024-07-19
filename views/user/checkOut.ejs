@@ -75,7 +75,7 @@
                                                     
                                                         <div class="mb-3">
                                                             <label class="form-label" for="billing-name">Land mark</label>
-                                                            <input type="text" class="form-control" name="landmark" placeholder="Enter landmark" value="<%=address[0].landmark %>">
+                                                            <input type="text" class="form-control" name="landmark" placeholder="Enter landmark" value="<%= address[0] ? address[0].landmark :"" %>">
                                                         </div>
                                                     
                                                     
