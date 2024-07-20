@@ -147,7 +147,7 @@
             <div class="d-flex justify-content-between">
               <% totalPrice = totalPrice + GST + Shipping; %>
               <p class="mb-2">Total price:</p>
-              <p class="mb-2 fw-bold" id="total-price" data-price="<%= totalPrice %>"><%= totalPrice %></p>
+              <p class="mb-2 fw-bold" id="total-price" data-price="<%= totalPrice %>"><%= totalPrice.toFixed(2) %></p>
             </div>
             <div class="mt-3">
               <% if (productData.length !== 0) { %>
