@@ -19,7 +19,7 @@ const viewOrders= async (req,res)=>{
     try{
         // const updateOrder = await updateOrderStatus(user_id)
         
-        const orderData = await orderCollection.find({customer_id:user_id,orderStatus:{$in:['Pending','Confirmed','Shipped']}}).sort({createdAt:-1})
+        const orderData = await orderCollection.find({customer_id:user_id,orderStatus:{$in:['Pending','Confirmed','Shipped','Delivered']}}).sort({createdAt:-1})
         const pendingOrders = await orderCollection.find({customer_id:user_id,orderStatus:'Payment Pending'}).sort({createdAt:-1})
         
         res.render('./user/order',{orderData,notification,pendingOrders})
