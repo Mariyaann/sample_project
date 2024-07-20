@@ -382,7 +382,7 @@ const failed = (req,res)=>{
                         order_id: orderDetails.order_id,
                         transactionType: 'Credited'
                     };
-                    const checkWallet = await walletCollection.findOne({ customer_id: updateStatus.customer_id });
+                    const checkWallet = await walletCollection.findOne({ customer_id: userId });
                 if (checkWallet) {
                     await walletCollection.findOneAndUpdate(
                         { customer_id: userId },
