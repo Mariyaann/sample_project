@@ -33,8 +33,7 @@
         %>
         <h1>No pending Orders</h1>
         <%
-      } else %>
-      <% orderData.forEach(order => {  
+      } else { orderData.forEach(order => {  
         const totalProduct = order.products.length
         const productImage = order.products[0].product_image
         %>
