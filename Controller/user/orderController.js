@@ -376,7 +376,7 @@ const failed = (req,res)=>{
             const updateOrder = await orderCollection.findOneAndUpdate({_id : new ObjectId(orderId),customer_id: new ObjectId(userId)},{$set:{orderStatus:'Returned'}})
             if(updateOrder)
             {
-                if(orderDetails.paymentMethod === 'Wallet'){
+                if(orderDetails.paymentMethod === 'Wallet' || orderDetails.paymentMethod === 'razorpay' ){
                     const transaction_details = {
                         wallet_amount: orderDetails.totalPrice,
                         order_id: orderDetails.order_id,
