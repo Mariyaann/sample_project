@@ -19,7 +19,7 @@ const viewOrders= async (req,res)=>{
     try{
         // const updateOrder = await updateOrderStatus(user_id)
         
-        const totalOrder = await orderCollection.find({customer_id:user_id}).count()
+        const totalOrder = await orderCollection.find({customer_id:user_id,orderStatus:{$in:['Confirmed', 'Pending', 'Delivered', 'Returned', 'Cancelled','Shipped','Payment Pending']}}).sort({createdAt:-1})
         const orderData = await orderCollection.find({customer_id:user_id,orderStatus:{$in:['Pending','Confirmed','Shipped']}}).sort({createdAt:-1})
         const pendingOrders = await orderCollection.find({customer_id:user_id,orderStatus:'Payment Pending'}).sort({createdAt:-1})
         

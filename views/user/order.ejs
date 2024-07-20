@@ -11,8 +11,8 @@
   successMessage("<%=notification.message%>")
 </script>
 <% }%>
-<% if(totalOrder ===0){ %>
-  <p><%=totalOrder  %></p>
+<% if(totalOrder.length === 0){ %>
+  <p><%= totalOrder.length   %></p>
 <div class="text-center mt-5 pt-5">
   <h5>No Order Pending!</h5>
 <p>Enjoy Shopping With Us</p>
