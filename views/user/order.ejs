@@ -32,7 +32,7 @@
     <div id="orderContent">
       <% if(orderData.length===0){
         %>
-        <h1>No pending Orders</h1>
+        <h6 class="text-center mt-5">No Pending orders found.</h6>
         <%
       } else { orderData.forEach(order => {  
         const totalProduct = order.products.length
