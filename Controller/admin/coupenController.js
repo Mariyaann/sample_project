@@ -7,32 +7,45 @@ let globalNotification = {};
 const showCoupen = async (req, res) => {
   const order = req.query.order || "";
   const category = req.query.category || "";
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
+  const skip = (page - 1) * limit;
+
   let sort = {};
   var notification = {};
+
   if (globalNotification.status) {
     notification = globalNotification;
     globalNotification = {};
   }
+
   if (category) {
-    if (order === "asc") sort[category] = 1;
-    else sort[category] = -1;
+    sort[category] = order === "asc" ? 1 : -1;
   } else {
     sort = { createdAt: -1 };
   }
 
   try {
     await checkCoupenStatus();
-    const coupenCount = await coupenCollection
-      .find({ coupen_status: 1 })
-      .count();
+
+    const totalCoupens = await coupenCollection.countDocuments({ coupen_status: 1 });
+    const totalPages = Math.ceil(totalCoupens / limit);
+
     const coupenData = await coupenCollection
       .find({ coupen_status: 1 })
-      .sort(sort);
+      .sort(sort)
+      .skip(skip)
+      .limit(limit);
+
     res.render("./admin/coupen", {
       notification,
-      coupenCount,
+      coupenCount: totalCoupens,
       coupenData,
       convertDateString,
+      page,
+      totalPages,
+      order,
+      category
     });
   } catch (err) {
     console.log(err);

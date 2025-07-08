@@ -51,7 +51,7 @@ router.get('/orderDetails/:id', adminSessionCheck, orderController.singleOrderde
 
 // --------------------------------- Coupen managment -------------------------- 
 
-router.get('/coupens',adminSessionCheck, coupenController.showCoupen)
+router.get('/coupens',adminSessionCheck, coupenController.showCoupen) 
 router.post('/add-coupen',adminSessionCheck, coupenController.addCoupen)
 router.get('/removeCoupen/:id',adminSessionCheck, coupenController.removeCoupen)
 router.get('/editCoupen/:id',adminSessionCheck,coupenController.editCoupen)

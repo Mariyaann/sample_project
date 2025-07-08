@@ -10,36 +10,57 @@ const listCategory = async (req, res) => {
   const category = req.query.category || "";
   const order = req.query.order || "";
   const search = req.query.search || "";
-  let query = {};
+  const page = parseInt(req.query.page) || 1;
+  const limit = 8;
+  const skip = (page - 1) * limit;
+
+  let sortQuery = {};
   if (globalNotification.status) {
     notification = globalNotification;
     globalNotification = {};
   }
+
   if (category && order) {
-    if (order === "asc") query[category] = 1;
-    else query[category] = -1;
+    sortQuery[category] = order === "asc" ? 1 : -1;
   } else {
-    query["timestamp"] = -1;
+    sortQuery["timestamp"] = -1;
   }
+
   try {
-    console.log(query);
+    const totalCount = await categoryCollection.countDocuments({
+      category_status: { $ne: -1 },
+      category_name: { $regex: search, $options: "i" },
+    });
+
+    const totalPages = Math.ceil(totalCount / limit);
+
     const categoryData = await categoryCollection
       .find({
         category_status: { $ne: -1 },
         category_name: { $regex: search, $options: "i" },
       })
-      .sort(query);
+      .sort(sortQuery)
+      .skip(skip)
+      .limit(limit);
+
     const categoryCount = await getCategoryCount();
+
     res.render("./admin/categoryList", {
       categoryData,
       dateFormat,
       notification,
       categoryCount,
+      page,
+      totalPages,
+      search,
+      order,
+      category,
     });
   } catch (err) {
-    console.log("Error occured :" + err);
+    console.log("Error occurred: " + err);
   }
 };
+
 
 // --------------------------- Adding new category ----------------------------------
 

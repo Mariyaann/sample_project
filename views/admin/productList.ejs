@@ -166,7 +166,7 @@
     <nav aria-label="Table navigation">
       <ul class="inline-flex items-center">
 
-        <% if (page > 1) { %>
+        <% if ( page && page > 1) { %>
           <li>
             <a href="?page=<%= page - 1 %>&search=<%= search %>&order=<%= order %>&category=<%= category %>" class="px-3 py-1 rounded-md focus:outline-none focus:shadow-outline-purple">Prev</a>
           </li>

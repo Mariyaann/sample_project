@@ -120,7 +120,8 @@ const addProduct = async (req, res) => {
         const productData = await productCollection.find({ product_status: { $ne: -1 } }).sort({ timestamp: -1 });
         const categoryData = await getCategory();
         const productCount= await getProductCount()
-        res.render('./admin/productList', { productData, categoryData, notification, dateFormat , productCount });
+        return res.redirect('/admin/products');
+        // res.render('./admin/productList', { productData, categoryData, notification, dateFormat , productCount, page:1 });
       } catch (err) {
         console.log(err);
       }
@@ -130,7 +131,8 @@ const addProduct = async (req, res) => {
       const productData = await productCollection.find({ product_status: { $ne: -1 } }).sort({ timestamp: -1 });
       const categoryData = await getCategory();
       const productCount= await getProductCount()
-      res.render('./admin/productList', { productData, categoryData, notification, dateFormat ,productCount});
+      return res.redirect('/admin/products');
+      // res.render('./admin/productList', { productData, categoryData, notification, dateFormat ,productCount, page:1});
     }}
     else{
         notification['status'] = 'error';
@@ -138,7 +140,8 @@ const addProduct = async (req, res) => {
         const productData = await productCollection.find({ product_status: { $ne: -1 } }).sort({ timestamp: -1 });
         const categoryData = await getCategory();
         const productCount= await getProductCount()
-        res.render('./admin/productList', { productData, categoryData, notification, dateFormat,productCount });
+        return res.redirect('/admin/products');
+        // res.render('./admin/productList', { productData, categoryData, notification, dateFormat,productCount, page:1 });
     }
   };
   
@@ -274,7 +277,7 @@ const updateProduct = async (req, res) => {
         const productData = await productCollection.find({ product_status: { $ne: -1 } }).sort({ timestamp: -1 });;
         const categoryData = await getCategory();
         const productCount= await getProductCount()
-        res.render('./admin/productList', { productData, categoryData, notification, dateFormat , productCount})
+        res.render('./admin/productList', { productData, categoryData, notification, dateFormat , productCount, page:1})
 
     }
     }
@@ -285,7 +288,7 @@ const updateProduct = async (req, res) => {
         const productData = await productCollection.find({ product_status: { $ne: -1 } }).sort({ timestamp: -1 });;
         const categoryData = await getCategory();
         const productCount= await getProductCount()
-        res.render('./admin/productList', { productData, categoryData, notification, dateFormat ,productCount})
+        res.render('./admin/productList', { productData, categoryData, notification, dateFormat ,productCount,page:1})
     }
 }
 

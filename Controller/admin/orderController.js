@@ -7,39 +7,57 @@ const { ObjectId } = require('mongodb');
 
 // ------------------------------ Show All Orders ------------------- 
 
-const showOrders = async (req,res)=>{
-    const category = req.query.category || '';
-    const order = req.query.order || '';
-    let query = {}
-    let notification ={}
-    if(globalNotification.status)
-        {
-            notification = globalNotification;
-            globalNotification={}
-        }
-        if(category && order)
-            {
-                if(order === 'asc')
-                    query[category]= 1
-                else
-                    query[category] = -1
-            }
-            else
-            {
-                query= {createdAt:-1}
-            }
-    try
-    {
-        const orderDetails = await orderCollection.find().sort(query)
-        const pendingCount = await orderCollection.find({orderStatus:'Pending'}).count()
-        res.render('./admin/orderList',{orderDetails,notification,pendingCount,dateFormat})
-    }
-    catch(err)
-    {
-        console.log(err);
-        res.redirect('/admin')
-    }
-}
+const showOrders = async (req, res) => {
+  const category = req.query.category || '';
+  const order = req.query.order || '';
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
+  const skip = (page - 1) * limit;
+
+  let query = {};
+  let notification = {};
+
+  if (globalNotification.status) {
+    notification = globalNotification;
+    globalNotification = {};
+  }
+
+  if (category && order) {
+    query[category] = order === 'asc' ? 1 : -1;
+  } else {
+    query = { createdAt: -1 };
+  }
+
+  try {
+    const totalCount = await orderCollection.countDocuments();
+    const totalPages = Math.ceil(totalCount / limit);
+
+    const orderDetails = await orderCollection
+      .find()
+      .sort(query)
+      .skip(skip)
+      .limit(limit);
+
+    const pendingCount = await orderCollection
+      .find({ orderStatus: 'Pending' })
+      .count();
+
+    res.render('./admin/orderList', {
+      orderDetails,
+      notification,
+      pendingCount,
+      dateFormat,
+      page,
+      totalPages,
+      category,
+      order,
+    });
+  } catch (err) {
+    console.log(err);
+    res.redirect('/admin');
+  }
+};
+
 
 // -------------------------------- Order accept, reject, cancel , deliver ---------------------- 
 

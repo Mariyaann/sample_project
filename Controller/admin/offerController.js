@@ -5,58 +5,70 @@ const { ObjectId } = require('mongodb');
 let GlobalNotification = {}
 
 const getOffer = async (req, res) => {
-    const category = req.query.category || ""
-    const order = req.query.order || ""
-    const searchStr = req.query.search || ""
+    const category = req.query.category || "";
+    const order = req.query.order || "";
+    const searchStr = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
     let notification = {};
     if (GlobalNotification.status) {
         notification = GlobalNotification;
         GlobalNotification = {};
     }
+
     let search = {}, sort = {};
+
     if (category && order) {
-        if (order === 'asc') {
-            sort = { category: 1 }
-        }
-        else
-            sort = { category: -1 }
+        sort[category] = order === 'asc' ? 1 : -1;
+    } else {
+        sort = { createdAt: -1 };
+    }
 
-    }
-    else {
-        sort = { createdAt: -1 }
-    }
     if (searchStr) {
-        search = { offer_name: { $regex: searchStr, $options: "i" } }
+        search = { offer_name: { $regex: searchStr, $options: "i" } };
     }
-
 
     await checkOfferStatus();
 
     try {
-        const offers = await offerCollection.aggregate([{ $match: search },
-        {
+        const totalOffers = await offerCollection.countDocuments(search);
+        const totalPages = Math.ceil(totalOffers / limit);
 
-            $lookup: {
-                from: 'categories',
-                localField: 'category_id', // Use the correct field name
-                foreignField: '_id',
-                as: 'category_data'
-            }
-        },
-        {
-            $lookup: {
-                from: 'products',
-                localField: 'product_id',
-                foreignField: '_id',
-                as: 'product_data'
-            }
-        },
-        {
-            $sort: sort
-        }
+        const offers = await offerCollection.aggregate([
+            { $match: search },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'category_id',
+                    foreignField: '_id',
+                    as: 'category_data'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'product_id',
+                    foreignField: '_id',
+                    as: 'product_data'
+                }
+            },
+            { $sort: sort },
+            { $skip: skip },
+            { $limit: limit }
         ]);
 
-        res.render('./admin/offer', { offers, notification, convertDateString });
+        res.render('./admin/offer', {
+            offers,
+            notification,
+            convertDateString,
+            page,
+            totalPages,
+            category,
+            order,
+            searchStr
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({ 'Message': "Internal Server Error" });
