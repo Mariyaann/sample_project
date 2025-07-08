@@ -74,10 +74,11 @@ const clientsListLoad = async (req, res) => {
   const sort = req.query.sort || "";
   const category = req.query.category || "";
   let query = { customer_status: { $ne: -1 } };
-  const page = req.query.page || 1;
-  const dataCount = page * 10;
-  const skipCount = page > 1 ? (page - 1) * 10 : 0;
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
+  const skip = (page - 1) * limit;
   let responce = {};
+
   if (search !== "") {
     query = {
       ...query,
@@ -89,26 +90,29 @@ const clientsListLoad = async (req, res) => {
   }
 
   try {
+    const totalClients = await clientCollection.countDocuments(query);
+    const totalPages = Math.ceil(totalClients / limit);
+
     let clientData;
-    if (sort !== "" && category !== "") {
+    if (sort && category) {
       const sortOption = {};
       sortOption[category] = sort === "asc" ? 1 : -1;
       clientData = await clientCollection
         .find(query)
         .sort(sortOption)
-        .skip(skipCount)
-        .limit(dataCount);
+        .skip(skip)
+        .limit(limit);
     } else {
-      clientData = await clientCollection
-        .find(query)
-        .skip(skipCount)
-        .limit(dataCount);
+      clientData = await clientCollection.find(query).skip(skip).limit(limit);
     }
+
     const userCount = await getUserCount();
+
     res.render("./admin/userList", {
       clientData,
       dateFormat,
       page,
+      totalPages,
       responce,
       userCount,
     });
@@ -116,6 +120,8 @@ const clientsListLoad = async (req, res) => {
     console.log(err);
   }
 };
+
+
 
 // -------------------------------------------------user Enable Disable Delete ------------------
 

@@ -1,5 +1,5 @@
 const  mongoose  = require("mongoose");
-import dotenv from "dotenv";
+const dotenv =  require('dotenv')
 dotenv.config()
 
 const connection = mongoose.connect(process.env.DB_URI || 'mongodb://localhost:27017/pure_qoqo')

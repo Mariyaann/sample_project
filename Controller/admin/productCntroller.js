@@ -6,68 +6,78 @@ const multer = require('../../Middleware/multer')
 const path = require('path');
 const { productValidation }= require('../../public/admin/validations')
 const { ObjectId } = require("mongodb");
-let productData = {}
 let globalNotification={}
-let productCount;
 
 
 // ---------------------- List all products -------------------------------- 
 
 const listProducts = async (req, res) => {
-    let notification={}
-    const search = req.query.search || ""
-    const category = req.query.category || ""
-    const order = req.query.order || ""
-    let query={}
-    
-    if(globalNotification.status)
-        {
-            notification=globalNotification;
-            globalNotification={}
-        }
-        if(category && order)
-            {
-                if(order==='asc')
-                     query[category]=1
-                else
-                    query[category]=-1
-            
-            }
-            else
-            {
-                query['timestamp']=-1
-                
+  let notification = {};
+  const search = req.query.search || "";
+  const category = req.query.category || "";
+  const order = req.query.order || "";
+  const page = parseInt(req.query.page) || 1;
+  const limit = 8;
+  const skip = (page - 1) * limit;
+  let sortQuery = {};
 
-            }
-    try {
-        console.log(search)
-        if (search !== '') {
+  if (globalNotification.status) {
+    notification = globalNotification;
+    globalNotification = {};
+  }
 
-            productData = await productCollection.find({
-                $and: [
-                    { product_status: { $ne: -1 } },
-                    {
-                        $or: [
-                            { product_name: { $regex: search, $options: 'i' } },
-                            { category_name: { $regex: search, $options: 'i' } }
-                        ]
-                    }
-                ]
-            }).sort(query);
-            
-        }
-        else {
-            productData = await productCollection.find({ product_status: { $ne: -1 } }).sort(query);
-        }
+  if (category && order) {
+    sortQuery[category] = order === "asc" ? 1 : -1;
+  } else {
+    sortQuery["timestamp"] = -1;
+  }
 
-        const categoryData = await getCategory()
-        const productCount= await getProductCount()
-        res.render('./admin/productList', { productData, categoryData, notification, dateFormat, productCount })
+  try {
+    let productQuery = { product_status: { $ne: -1 } };
+
+    if (search !== '') {
+      productQuery = {
+        $and: [
+          { product_status: { $ne: -1 } },
+          {
+            $or: [
+              { product_name: { $regex: search, $options: 'i' } },
+              { category_name: { $regex: search, $options: 'i' } }
+            ]
+          }
+        ]
+      };
     }
-    catch (err) {
-        console.log("fetching product details" + err)
-    }
-}
+
+    const totalProducts = await productCollection.countDocuments(productQuery);
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    const productData = await productCollection
+      .find(productQuery)
+      .sort(sortQuery)
+      .skip(skip)
+      .limit(limit);
+
+    const categoryData = await getCategory();
+    const productCount = await getProductCount();
+
+    res.render('./admin/productList', {
+      productData,
+      categoryData,
+      notification,
+      dateFormat,
+      productCount,
+      page,
+      totalPages,
+      search,
+      order,
+      category
+    });
+  } catch (err) {
+    console.log("Error fetching product details: " + err);
+  }
+};
+
 
 
 
