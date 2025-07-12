@@ -205,7 +205,8 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <form action="/admin/add-product" method="post" enctype="multipart/form-data">
+                  <form id="addProductForm" action="/admin/add-product" method="post" enctype="multipart/form-data">
+
                     <label class="block text-sm">
                       <span class="text-gray-700 dark:text-gray-400">Product Name</span>
                       <input
@@ -294,6 +295,68 @@
               </div>
             </div>
           </div>
+<script>
+  document.getElementById('addProductForm').addEventListener('submit', function (e) {
+    const name = this.product_name.value.trim();
+    const description = this.product_description.value.trim();
+    const price = parseFloat(this.product_price.value);
+    const quantity = this.product_quantity.value.trim();
+    const stock = parseInt(this.product_stock.value);
+    const category = this.product_category.value;
+    const images = this.product_images.files;
+
+    if (!name) {
+      validationError("Product name is required.");
+      e.preventDefault();
+      return;
+    }
+
+    if (!description) {
+      validationError("Product description is required.");
+      e.preventDefault();
+      return;
+    }
+
+    if (isNaN(price) || price <= 0) {
+      validationError("Enter a valid product price.");
+      e.preventDefault();
+      return;
+    }
+
+    if (!/^\d+$/.test(quantity)) {
+      validationError("Quantity must be a positive whole number.");
+      e.preventDefault();
+      return;
+    }
+
+    if (isNaN(stock) || stock < 0) {
+      validationError("Stock must be a non-negative number.");
+      e.preventDefault();
+      return;
+    }
+
+    if (!category) {
+      validationError("Please select a product category.");
+      e.preventDefault();
+      return;
+    }
+
+    if (images.length === 0) {
+      validationError("Please upload at least one product image.");
+      e.preventDefault();
+      return;
+    }
+  });
+
+  // Helper function
+  function validationError(message) {
+    if (typeof window.validationError === "function") {
+      window.validationError(message); // From alerts.js
+    } else {
+      alert(message);
+    }
+  }
+</script>
 
           <script src="../../admin/productScript.js"></script>
 
