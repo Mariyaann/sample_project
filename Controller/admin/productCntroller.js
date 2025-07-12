@@ -274,10 +274,14 @@ const updateProduct = async (req, res) => {
         );
         notification['status'] = 'success'
         notification['message'] = 'Product Updated Successfully'
+
         const productData = await productCollection.find({ product_status: { $ne: -1 } }).sort({ timestamp: -1 });;
         const categoryData = await getCategory();
         const productCount= await getProductCount()
-        res.render('./admin/productList', { productData, categoryData, notification, dateFormat , productCount, page:1})
+        const totalProducts = await productCollection.countDocuments();
+        const totalPages = Math.ceil(totalProducts / 10);
+        return res.redirect('/admin/products');
+        // res.render('./admin/productList', { productData, categoryData, notification, dateFormat , productCount, page:1, totalPages})
 
     }
     }
