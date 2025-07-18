@@ -127,7 +127,7 @@ const removeCoupen = async (req, res) => {
 // ---------------- load coupen edit page --------------
 
 const editCoupen = async (req, res) => {
-  const notification = {};
+  let notification = {};
   if (globalNotification.status) {
     notification = globalNotification;
     globalNotification = {};
