@@ -29,10 +29,10 @@
                 <label for="price-range">FILTER BY CATEGORY</label>
                 <ul>
                   <%categoryData.forEach((data)=>{%>
-                    <a href="/shop?category=<%=data.category_id%>">
+                    <a href="/shop?category=<%=data?.category_id%>">
                       <li class="categoty-item">
-                        <%if(data.category_name!==null){%>
-                        <%=data.category_name%> <span class="dim">(<%=data.count%>)</span>
+                        <%if(data?.category_name && data?.category_name!==null){%>
+                        <%=data?.category_name%> <span class="dim">(<%=data.count%>)</span>
                         <%}%>
                       </li>
                     </a>
@@ -50,7 +50,7 @@
               <div class="container">
                 <div class="flex">
                   <% if(category) {%>
-                    <h6><a href="/">Home</a> / <a href="/shop">Shop</a>  / <span class="color"><%= productData[0].category_name  %></span></h6>
+                    <h6><a href="/">Home</a> / <a href="/shop">Shop</a>  / <span class="color"><%= productData[0]?.category_name  %></span></h6>
                     <% } else { %>
                       <h6><a href="/">Home</a> / <a href="/shop">Shop</a> / <span class="color">All Product</span></h6>
                     <%  } %>
@@ -89,7 +89,7 @@
                         <img src="../../<%= img %>" class="img-fluid product-thumbnail">
                       </div>
                       <div class="flex">
-                        <p class="color-primary"><%= data.category_name %></p>
+                        <p class="color-primary"><%= data?.category_name %></p>
                         <div><button type="button" name="fav-icon"  class="fav-icon" data-id="<%= data._id %>">
                           <% if(data.isWishlist === true)
                           {%>
