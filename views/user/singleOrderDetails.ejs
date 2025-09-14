@@ -11,11 +11,17 @@
  <div class="container-fluid pt-5 ">
     <div class="row">
         <div class="col-xl-8">
-            <% let total =0;
-            productData.products.forEach(product => { 
-                total+=(product.product_price * product.product_quantity)
-                %>
-                
+            <!-- Active Products Section -->
+            <h5 class="mb-3">Active Products</h5>
+            
+            <!-- <% let total =0;
+            let totalQuantity = 0;
+            if(activeProducts && activeProducts.length > 0) {
+                activeProducts.forEach(product => { 
+                    total+=(product.product_price * product.product_quantity)
+                    totalQuantity += product.product_quantity
+                    %>
+                 -->
            
             <div class="card border shadow-none mb-3">
                 <div class="card-body">
@@ -69,6 +75,10 @@
                                 <div class="mt-3">
                                     <p class="text-muted mb-2">Total</p>
                                     <h5 class="color">₹<%= product.product_price * product.product_quantity %></h5>
+                                    <% if(productData.orderStatus!=='Delivered' && productData.orderStatus!=='Returned' && productData.orderStatus!=='Cancelled' && product.product_status!=='Cancelled'){ %>
+                                        <a href="/cancel-order-item/<%= String(productData._id) %>/<%= String(product.product_id) %>" class="btn btn-link p-0" onclick="return confirm('Cancel this item?');">Cancel this item</a>
+                                        
+                                    <% } %>
                                 </div>
                             </div>
                         </div>
@@ -77,8 +87,65 @@
                 </div>
             </div>
             <% }); %>
+            <% } else { %>
+                <div class="alert alert-info">No active products in this order.</div>
+            <% } %>
             
-            
+            <!-- Cancelled Products Section -->
+            <% if(cancelledProducts && cancelledProducts.length > 0) { %>
+                <h5 class="mb-3 mt-4" style="color: #dc3545;">Cancelled Products</h5>
+                <% cancelledProducts.forEach(product => { %>
+                    <div class="card border shadow-none mb-3" style="opacity: 0.7; border-left: 4px solid #dc3545;">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center border-bottom pb-3">
+                                <div>
+                                    <div class="me-4">
+                                    <img src="../../<%=product.product_image %>" alt="" class="avatar-lg rounded order-product-img">
+                                </div>
+                                </div>
+                                <div class="flex-grow-1 align-self-center overflow-hidden">
+                                    <div>
+                                        <h5 class="text-truncate font-size-16"><%= product.product_name %></h5>
+                                        <p class="text-muted mb-0">
+                                            <span class="me-2">Rating: <span class="text-warning">★★★★★</span></span>
+                                        </p>
+                                        <p class="text-muted mb-0">
+                                            <span class="me-2">Category: <span class="fw-medium"><%= product.product_category %></span></span>
+                                        </p>
+                                        <p class="text-muted mb-0">
+                                            <span class="me-2">Payment: <span class="fw-medium"><%= productData.paymentMethod %></span></span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <div>
+                                        <h5 class="font-size-16 text-muted mb-0">₹<%= product.product_price %></h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div>
+                                        <p class="text-muted mb-2">Quantity</p>
+                                        <div class="input-group input-group-sm" style="width: 100px;">
+                                            <input type="text" class="form-control" value="<%= product.product_quantity %>" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mt-3">
+                                        <p class="text-muted mb-2">Total</p>
+                                        <h5 class="color">₹<%= product.product_price * product.product_quantity %></h5>
+                                        <div style="font-size: 12px; color: #dc3545; font-weight: bold;">
+                                            CANCELLED
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } %>
             
         </div>
 
@@ -96,28 +163,28 @@
                                 <tbody>
                                     <tr>
                                         <td>Sub Total</td>
-                                        <td class="text-end"><%= total %></td>
+                                        <td class="text-end">₹<%= total.toFixed(2) %></td>
                                     </tr>
                                     <tr>
                                         <% const GST = Math.round((18 / 100) * total * 100) / 100; %>
                                         <td>GST</td>
-                                        <td class="text-end"><%=GST %></td>
+                                        <td class="text-end">₹<%=GST %></td>
                                     </tr>
                                     
                                     <tr>
                                         <td>Shipping Charge :</td>
-                                        <td class="text-end">₹ 25</td>
+                                        <td class="text-end">₹<%= total <= 1000 ? '25' : '0' %></td>
                                     </tr>
                                     <tr>
                                         <td>Total Quantity</td>
-                                        <td class="text-end"><%=productData.totalQuantity %></td>
+                                        <td class="text-end"><%= totalQuantity %></td>
                                     </tr>
                                     
                                     <tr class="bg-light">
                                         <th>Total :</th>
                                         <td class="text-end">
                                             <span class="fw-bold">
-                                                ₹ <%= productData.totalPrice %>
+                                                ₹ <%= (total + GST + (total <= 1000 ? 25 : 0)).toFixed(2) %>
                                             </span>
                                         </td>
                                     </tr>
@@ -134,7 +201,7 @@
                     </div>
                 </div>
             </div>
-            <% const address =productData.address %>
+            <% const address = productData.address || {} %>
             <div class=" mt-lg-3 mt-3"><div class="card border shadow-none">
                     <div class="card-header bg-transparent border-bottom py-3 px-4">
                         <h6 class="font-size-16 mb-0">Shipping Address</h6>
@@ -142,21 +209,25 @@
                     <div class="single-address-div">
                           
                           <div class="address">
+                            <% if (address && Object.keys(address).length > 0) { %>
                             <p><span>
-                                <i class='bx bx-home'></i> <%=address.building %>,
+                                <i class='bx bx-home'></i> <%=address.building || 'N/A' %>,
                               </span>
                               <span>
-                                <%=address.street %>
+                                <%=address.street || 'N/A' %>
                               </span>
                               <span>
-                                <%=address.city %> ,
+                                <%=address.city || 'N/A' %> ,
                               
-                             <%=address.country %> ,<%=address.pincode %>,<%=address.phonenumber
+                             <%=address.country || 'N/A' %> ,<%=address.pincode || 'N/A' %>,<%=address.phonenumber || 'N/A'
                                       %>
                                     </span>
                             <span>
-                              <%=address.landmark %>
+                              <%=address.landmark || 'N/A' %>
                             </span></p>
+                            <% } else { %>
+                            <p class="text-muted">No shipping address available for this order.</p>
+                            <% } %>
                           </div>
                         </div>
                     </div>
