@@ -75,6 +75,8 @@ router.get('/success',userSessionCheck,cartController.successPage)
 router.get('/verify-payment',userSessionCheck,cartController.paymentVerification)
 router.post('/razorpay',userSessionCheck,cartController.razorpayPayment)
 router.post('/razorpay-order',userSessionCheck,cartController.razorpayOrder)
+router.post('/release-payment-lock',userSessionCheck,cartController.releasePaymentLock)
+router.get('/check-payment-lock',userSessionCheck,cartController.checkPaymentLock)
 router.get('/payment-success/:id/:orderId',userSessionCheck,cartController.updateOrderPayment)
 router.post('/order-by-status',userSessionCheck,orderController.orderByStatus);
 router.get('/cancel-pending-order/:id',userSessionCheck,orderController.cancelPendingOrder)

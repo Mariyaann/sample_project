@@ -669,7 +669,27 @@ const retryPaymentRazorpay = async (req, res) => {
 
     const user_id = req.session.user;
 
-  
+    // Check server-side payment lock
+    console.log('Repayment check - session:', req.session.paymentInProgress, 'time:', req.session.paymentLockTime);
+    
+    // Auto-release lock if it's older than 5 minutes
+    if(req.session.paymentInProgress && req.session.paymentLockTime){
+      const lockAge = Date.now() - req.session.paymentLockTime;
+      if(lockAge > 5 * 60 * 1000) { // 5 minutes
+        console.log('Auto-releasing stale repayment lock, age:', lockAge);
+        req.session.paymentInProgress = false;
+        req.session.paymentLockTime = null;
+      }
+    }
+    
+    if(req.session.paymentInProgress){
+      console.log('Repayment already in progress, rejecting request');
+      return res.status(409).json({ message: 'Payment is already in progress. Please wait.' });
+    }
+    
+    // Set server-side payment lock
+    req.session.paymentInProgress = true;
+    req.session.paymentLockTime = Date.now();
 
     try {
 
@@ -755,7 +775,11 @@ const repaymentSuccess = async (req,res)=>{
 
     const userId = req.session.user
 
-
+    // Release server-side payment lock on success
+    if(req.session.paymentInProgress){
+      req.session.paymentInProgress = false;
+      req.session.paymentLockTime = null;
+    }
 
     console.log("orderId",orderId)
 

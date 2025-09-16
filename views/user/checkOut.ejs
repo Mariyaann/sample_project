@@ -255,7 +255,10 @@
                 </div> <!-- end col -->
                 <div class="col">
                     <div class="text-end mt-2 mt-sm-0">
-                        <button type="submit" id="procced-button" class="btn btn-success" data-user='<%=userData.customer_name %>' data-email='<%=userData.customer_emailid%>'>
+                        <div id="payment-lock-banner" style="display:none; margin-bottom:8px;" class="alert alert-warning">
+                            Payment is already in process in another tab or window. Please wait.
+                        </div>
+                        <button type="submit" id="procced-button" class="btn btn-success" data-user='<%=userData.customer_name %>' data-email='<%=userData.customer_emailid%>' data-user-id='<%= userId %>'>
                             <i class="mdi mdi-cart-outline me-1"></i> Procced </button>
                     </div>
                 </div> <!-- end col -->

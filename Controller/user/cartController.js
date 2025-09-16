@@ -225,7 +225,7 @@ const checkoutPage = async (req, res) => {
     if(!walletamount) amount_wallet=0
     else amount_wallet = walletamount.wallet_balance.toFixed(2)
     if (productData.length !== 0) {
-      res.render("./user/checkOut", { userData, productData, notification , walletamount: amount_wallet });
+      res.render("./user/checkOut", { userData, userId: user_id, productData, notification , walletamount: amount_wallet });
     } else {
       globalNotification = {
         status: "error",
@@ -249,6 +249,30 @@ const checkoutPage = async (req, res) => {
 const razorpayPayment = async (req,res)=>{
   
   const userId = req.session.user;
+  
+  // Check server-side payment lock
+  console.log('Razorpay payment check - session:', req.session.paymentInProgress, 'time:', req.session.paymentLockTime);
+  
+  // Auto-release lock if it's older than 5 minutes
+  if(req.session.paymentInProgress && req.session.paymentLockTime){
+    const lockAge = Date.now() - req.session.paymentLockTime;
+    if(lockAge > 5 * 60 * 1000) { // 5 minutes
+      console.log('Auto-releasing stale payment lock, age:', lockAge);
+      req.session.paymentInProgress = false;
+      req.session.paymentLockTime = null;
+    }
+  }
+  
+  if(req.session.paymentInProgress){
+    console.log('Payment already in progress, rejecting request');
+    return res.status(409).json({ message: 'Payment is already in progress. Please wait.' });
+  }
+  
+  // Set server-side payment lock
+  req.session.paymentInProgress = true;
+  req.session.paymentLockTime = Date.now();
+  console.log('Payment lock set for user:', userId);
+  
   const  coupenCode = req.body.coupen_code
   
   const addressData = {
@@ -498,6 +522,14 @@ const checkOut = async (req, res) => {
   const razorPaymentStatus = req.body.paymentStatus
   console.log(razorPaymentStatus)
   const userId = req.session.user;
+  
+  // Release server-side payment lock on checkout completion
+  console.log('Checkout completion - releasing lock. Was locked:', req.session.paymentInProgress);
+  if(req.session.paymentInProgress){
+    req.session.paymentInProgress = false;
+    req.session.paymentLockTime = null;
+    console.log('Payment lock released on checkout completion');
+  }
   const addressData = {
     customer_name: req.body.customer_name,
     customer_emailid: req.body.customer_emailid,
@@ -830,6 +862,39 @@ const getCartCount = async (req, res) => {
   }
 };
 
+// ------------------------------- Release Payment Lock ----------------------- 
+const releasePaymentLock = async (req, res) => {
+  try {
+    console.log('Release lock request - was locked:', req.session.paymentInProgress);
+    if(req.session.paymentInProgress){
+      req.session.paymentInProgress = false;
+      req.session.paymentLockTime = null;
+      console.log('Payment lock manually released');
+      return res.status(200).json({ message: 'Payment lock released' });
+    }
+    return res.status(200).json({ message: 'No active payment lock' });
+  } catch (error) {
+    console.error('Error releasing payment lock:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+// ------------------------------- Check Payment Lock Status ----------------------- 
+const checkPaymentLock = async (req, res) => {
+  try {
+    const lockStatus = {
+      isLocked: !!req.session.paymentInProgress,
+      lockTime: req.session.paymentLockTime,
+      lockAge: req.session.paymentLockTime ? Date.now() - req.session.paymentLockTime : 0
+    };
+    console.log('Lock status check:', lockStatus);
+    return res.status(200).json(lockStatus);
+  } catch (error) {
+    console.error('Error checking payment lock:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 
 
 // ------------------------------------ Product avaible or not checking --------------------------- 
@@ -1022,5 +1087,7 @@ module.exports = {
   updateOrderPayment,
   razorpayOrder,
   updateCartQantity,
-  getCartCount
+  getCartCount,
+  releasePaymentLock,
+  checkPaymentLock
 };
